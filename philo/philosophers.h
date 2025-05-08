@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkurkar <mkurkar@student.42.fr>            +#+  +:+       +#+        */
+/*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 17:27:46 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/07 20:54:14 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/08 21:52:31 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <limits.h>
 # include <sys/time.h>
 
-enum e_exit_status
+typedef enum e_exit_status
 {
 	SUCCESS = 0,
 	FAILURE = 1

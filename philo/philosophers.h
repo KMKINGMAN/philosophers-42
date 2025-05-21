@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 17:27:46 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/08 21:52:31 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/21 20:26:25 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,10 @@ typedef enum e_exit_status
 	FAILURE = 1
 } t_exit_status;
 
-// # define SUCCESS 0
-// # define FAILURE 1
+/* Commented out because using enum instead
+# define SUCCESS 0
+# define FAILURE 1
+*/
 
 typedef struct s_data	t_data;
 
@@ -75,7 +77,6 @@ int			init_forks(t_data *data);
 int			create_threads(t_data *data);
 void		*philosopher_routine(void *arg);
 void		*monitor_routine(void *arg);
-int			simulation_end(t_data *data);
 
 /* Action functions */
 int			philo_eat(t_philo *philo);

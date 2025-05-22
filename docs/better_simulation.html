@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dining Philosophers Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 1rem;
+            color: #333;
+        }
+        .controls {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 0.5rem; /* Reduced gap */
+        }
+        .controls button {
+            padding: 0.6rem 1rem; /* Adjusted padding */
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .controls button:active {
+            transform: scale(0.98);
+        }
+        .btn-start { background-color: #4CAF50; color: white; }
+        .btn-start:hover { background-color: #45a049; }
+        .btn-pause { background-color: #FFA500; color: white; }
+        .btn-pause:hover { background-color: #e69500; }
+        .btn-resume { background-color: #2196F3; color: white; }
+        .btn-resume:hover { background-color: #1e88e5; }
+
+        #table-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            border: 2px solid #cbd5e1; /* Tailwind slate-300 */
+            border-radius: 50%;
+            margin: 2rem auto;
+            background-color: #f8fafc; /* Tailwind slate-50 */
+        }
+
+        .philosopher {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+            transition: background-color 0.5s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .philosopher .name {
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+        .fork {
+            position: absolute;
+            width: 20px; /* Width of the fork icon container */
+            height: 40px; /* Height of the fork icon container */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.5s ease, transform 0.3s ease;
+            font-size: 1.5rem; /* Size of the fork icon */
+        }
+        .fork-available { color: #9ca3af; /* Tailwind gray-400 */ }
+        .fork-taken { color: #1f2937; /* Tailwind gray-800 */ transform: scale(1.1); }
+        
+        .status-log {
+            margin-top: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            height: 100px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0; /* Tailwind slate-200 */
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            background-color: #fff;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        .log-entry {
+            margin-bottom: 0.25rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="text-3xl font-bold text-gray-700 mb-6">Dining Philosophers</h1>
+
+    <div class="controls">
+        <button id="startButton" class="btn-start">Start / Restart</button>
+        <button id="pauseButton" class="btn-pause">Pause</button>
+        <button id="resumeButton" class="btn-resume" disabled>Resume</button>
+    </div>
+    
+    <div id="numPhilosophersContainer" class="mb-4 flex items-center gap-2">
+        <label for="numPhilosophersInput" class="text-sm font-medium text-gray-600">Philosophers (3-8):</label>
+        <input type="number" id="numPhilosophersInput" value="5" min="3" max="8" class="w-20 p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+    </div>
+
+    <div id="table-container">
+        </div>
+
+    <div class="status-log" id="statusLog">
+        <p class="text-gray-500 italic">Simulation log will appear here...</p>
+    </div>
+
+    <script>
+        const tableContainer = document.getElementById('table-container');
+        const startButton = document.getElementById('startButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const resumeButton = document.getElementById('resumeButton');
+        const numPhilosophersInput = document.getElementById('numPhilosophersInput');
+        const statusLog = document.getElementById('statusLog');
+
+        let NUM_PHILOSOPHERS = 5;
+        const TABLE_RADIUS = 150; // pixels
+        const PHILOSOPHER_ELEMENT_SIZE = 70; // pixels
+        const FORK_ELEMENT_SIZE = 40; // pixels, for positioning offset
+
+        const THINK_TIME_MIN = 2000; // ms
+        const THINK_TIME_MAX = 5000; // ms
+        const EAT_TIME_MIN = 2000;   // ms
+        const EAT_TIME_MAX = 5000;   // ms
+        const RETRY_DELAY = 200;    // ms for hungry philosopher to retry
+
+        let philosophers = [];
+        let forks = [];
+        let isPaused = false;
+        let simulationRunning = false;
+        let logCounter = 0;
+
+        const PHILOSOPHER_COLORS = {
+            THINKING: 'bg-blue-500', // Tailwind: blue-500
+            HUNGRY: 'bg-orange-500', // Tailwind: orange-500
+            EATING: 'bg-green-500',  // Tailwind: green-500
+        };
+
+        function addLogEntry(message) {
+            if (logCounter === 0) {
+                statusLog.innerHTML = ''; // Clear initial message
+            }
+            logCounter++;
+            const entry = document.createElement('p');
+            entry.className = 'log-entry';
+            entry.textContent = `${logCounter}. ${message}`;
+            statusLog.appendChild(entry);
+            statusLog.scrollTop = statusLog.scrollHeight; // Auto-scroll to bottom
+            if (logCounter > 100) { // Keep log from growing too large
+                statusLog.removeChild(statusLog.firstChild);
+            }
+        }
+
+        function initSimulation() {
+            NUM_PHILOSOPHERS = parseInt(numPhilosophersInput.value);
+            if (NUM_PHILOSOPHERS < 3 || NUM_PHILOSOPHERS > 8) {
+                alert("Number of philosophers must be between 3 and 8.");
+                numPhilosophersInput.value = 5; // Reset to default
+                NUM_PHILOSOPHERS = 5;
+            }
+
+            tableContainer.innerHTML = ''; // Clear previous elements
+            philosophers = [];
+            forks = [];
+            isPaused = false;
+            simulationRunning = true;
+            logCounter = 0;
+            statusLog.innerHTML = '<p class="text-gray-500 italic">Simulation log will appear here...</p>';
+
+
+            // Initialize Forks
+            for (let i = 0; i < NUM_PHILOSOPHERS; i++) {
+                const fork = {
+                    id: i,
+                    isTakenBy: -1, // -1 if available, philosopherId if taken
+                    element: document.createElement('div'),
+                    takenByPhilosopherElement: null, // Store philosopher element when taken
+                };
+                fork.element.className = 'fork fork-available';
+                fork.element.innerHTML = `<i class="fas fa-utensils"></i>`; // Fork icon
+
+                // Position forks
+                // Angle for fork i is between philosopher i and philosopher (i-1+N)%N if P_i uses F_i (left) and F_(i+1)%N (right)
+                // This means fork `k` is to the "left" of philosopher `k`.
+                // Let's place fork `k` at an angle that visually corresponds to its ID around the table.
+                // A fork `k` is between P_k and P_(k+1)%N. (P_k's right, P_(k+1)%N's left)
+                // So P_k needs fork `k` (its right) and fork `(k-1+N)%N` (its left).
+                // Let's use the common model: P_i needs fork_i (left) and fork_(i+1)%N (right).
+                // So fork_i is to the left of P_i.
+                const angle = (i / NUM_PHILOSOPHERS) * 2 * Math.PI - (Math.PI / NUM_PHILOSOPHERS) - (Math.PI / 2);
+                const forkX = TABLE_RADIUS * 0.7 * Math.cos(angle) + (tableContainer.offsetWidth / 2) - (FORK_ELEMENT_SIZE / 2);
+                const forkY = TABLE_RADIUS * 0.7 * Math.sin(angle) + (tableContainer.offsetHeight / 2) - (FORK_ELEMENT_SIZE / 2);
+                
+                fork.element.style.left = `${forkX}px`;
+                fork.element.style.top = `${forkY}px`;
+                fork.element.title = `Fork ${i}`;
+
+                tableContainer.appendChild(fork.element);
+                forks.push(fork);
+            }
+
+            // Initialize Philosophers
+            for (let i = 0; i < NUM_PHILOSOPHERS; i++) {
+                const philosopher = {
+                    id: i,
+                    state: 'THINKING', // THINKING, HUNGRY, EATING
+                    element: document.createElement('div'),
+                    stateElement: document.createElement('span'),
+                    leftForkId: i,
+                    rightForkId: (i + 1) % NUM_PHILOSOPHERS,
+                    thinkTimeoutId: null,
+                    eatTimeoutId: null,
+                    retryTimeoutId: null,
+                    operationStartTime: 0,
+                    remainingTime: 0,
+                };
+                philosopher.element.className = `philosopher ${PHILOSOPHER_COLORS.THINKING}`;
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name';
+                nameSpan.textContent = `P${i}`;
+                philosopher.stateElement.textContent = 'Thinking';
+                philosopher.element.appendChild(nameSpan);
+                philosopher.element.appendChild(philosopher.stateElement);
+
+                // Position philosophers
+                const angle = (i / NUM_PHILOSOPHERS) * 2 * Math.PI - (Math.PI / 2); // Start at top
+                const x = TABLE_RADIUS * Math.cos(angle) + (tableContainer.offsetWidth / 2) - (PHILOSOPHER_ELEMENT_SIZE / 2);
+                const y = TABLE_RADIUS * Math.sin(angle) + (tableContainer.offsetHeight / 2) - (PHILOSOPHER_ELEMENT_SIZE / 2);
+                philosopher.element.style.left = `${x}px`;
+                philosopher.element.style.top = `${y}px`;
+                
+                tableContainer.appendChild(philosopher.element);
+                philosophers.push(philosopher);
+            }
+            
+            philosophers.forEach(p => startThinking(p));
+            updateUI();
+            pauseButton.disabled = false;
+            resumeButton.disabled = true;
+            addLogEntry("Simulation started with " + NUM_PHILOSOPHERS + " philosophers.");
+        }
+
+        function updatePhilosopherUI(p) {
+            p.element.className = `philosopher ${PHILOSOPHER_COLORS[p.state]}`;
+            let stateText = p.state.charAt(0) + p.state.slice(1).toLowerCase();
+            if (p.state === 'HUNGRY') stateText = 'Hungry';
+            p.stateElement.textContent = stateText;
+        }
+
+        function updateForkUI(fork) {
+            if (fork.isTakenBy !== -1) {
+                fork.element.classList.remove('fork-available');
+                fork.element.classList.add('fork-taken');
+                // Optionally, color fork based on philosopher, or show who has it
+                // fork.element.style.color = philosophers[fork.isTakenBy].element.style.backgroundColor; // Too complex for now
+                fork.element.title = `Fork ${fork.id} (Taken by P${fork.isTakenBy})`;
+            } else {
+                fork.element.classList.remove('fork-taken');
+                fork.element.classList.add('fork-available');
+                fork.element.title = `Fork ${fork.id} (Available)`;
+            }
+        }
+        
+        function updateUI() {
+            philosophers.forEach(updatePhilosopherUI);
+            forks.forEach(updateForkUI);
+        }
+
+        function clearAllTimeouts() {
+            philosophers.forEach(p => {
+                if (p.thinkTimeoutId) clearTimeout(p.thinkTimeoutId);
+                if (p.eatTimeoutId) clearTimeout(p.eatTimeoutId);
+                if (p.retryTimeoutId) clearTimeout(p.retryTimeoutId);
+                p.thinkTimeoutId = null;
+                p.eatTimeoutId = null;
+                p.retryTimeoutId = null;
+            });
+        }
+        
+        function getRandomTime(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function startThinking(p) {
+            if (isPaused || !simulationRunning) return;
+            p.state = 'THINKING';
+            updatePhilosopherUI(p);
+            addLogEntry(`P${p.id} is now thinking.`);
+
+            const thinkTime = p.remainingTime > 0 ? p.remainingTime : getRandomTime(THINK_TIME_MIN, THINK_TIME_MAX);
+            p.operationStartTime = Date.now();
+            p.remainingTime = 0; // Reset remaining time
+
+            p.thinkTimeoutId = setTimeout(() => {
+                if (isPaused || !simulationRunning) return;
+                becomeHungry(p);
+            }, thinkTime);
+        }
+
+        function becomeHungry(p) {
+            if (isPaused || !simulationRunning) return;
+            p.state = 'HUNGRY';
+            updatePhilosopherUI(p);
+            addLogEntry(`P${p.id} is now hungry and wants forks ${p.leftForkId} & ${p.rightForkId}.`);
+            tryToEat(p);
+        }
+
+        function tryToEat(p) {
+            if (isPaused || !simulationRunning) {
+                 // If paused while trying to eat, mark to retry on resume
+                if (isPaused) p.state = 'HUNGRY_PENDING_RETRY';
+                return;
+            }
+            if (p.state === 'HUNGRY_PENDING_RETRY') p.state = 'HUNGRY'; // Reset state
+
+            // Deadlock prevention: pick up lower indexed fork first
+            const forkId1 = p.leftForkId;
+            const forkId2 = p.rightForkId;
+
+            const firstForkToAcquireId = Math.min(forkId1, forkId2);
+            const secondForkToAcquireId = Math.max(forkId1, forkId2);
+            
+            const firstFork = forks[firstForkToAcquireId];
+            const secondFork = forks[secondForkToAcquireId];
+
+            if (firstFork.isTakenBy === -1) { // Try to take first fork
+                firstFork.isTakenBy = p.id;
+                updateForkUI(firstFork);
+                addLogEntry(`P${p.id} picked up Fork ${firstFork.id}.`);
+
+                if (secondFork.isTakenBy === -1) { // Try to take second fork
+                    secondFork.isTakenBy = p.id;
+                    updateForkUI(secondFork);
+                    addLogEntry(`P${p.id} picked up Fork ${secondFork.id}.`);
+                    startEating(p);
+                } else { // Second fork is taken, release first fork
+                    addLogEntry(`P${p.id} could not get Fork ${secondFork.id} (taken by P${secondFork.isTakenBy}). Releasing Fork ${firstFork.id}.`);
+                    firstFork.isTakenBy = -1;
+                    updateForkUI(firstFork);
+                    scheduleRetry(p);
+                }
+            } else { // First fork is taken
+                addLogEntry(`P${p.id} could not get Fork ${firstFork.id} (taken by P${firstFork.isTakenBy}). Will retry.`);
+                scheduleRetry(p);
+            }
+        }
+        
+        function scheduleRetry(p) {
+            if (isPaused || !simulationRunning) return;
+            p.retryTimeoutId = setTimeout(() => {
+                if (isPaused || !simulationRunning) return;
+                 tryToEat(p);
+            }, RETRY_DELAY);
+        }
+
+        function startEating(p) {
+            if (isPaused || !simulationRunning) return;
+            p.state = 'EATING';
+            updatePhilosopherUI(p);
+            addLogEntry(`P${p.id} started eating with Forks ${p.leftForkId} & ${p.rightForkId}.`);
+
+            const eatTime = p.remainingTime > 0 ? p.remainingTime : getRandomTime(EAT_TIME_MIN, EAT_TIME_MAX);
+            p.operationStartTime = Date.now();
+            p.remainingTime = 0;
+
+            p.eatTimeoutId = setTimeout(() => {
+                if (isPaused || !simulationRunning) return;
+                finishEating(p);
+            }, eatTime);
+        }
+
+        function finishEating(p) {
+            if (isPaused || !simulationRunning) return;
+            
+            forks[p.leftForkId].isTakenBy = -1;
+            updateForkUI(forks[p.leftForkId]);
+            forks[p.rightForkId].isTakenBy = -1;
+            updateForkUI(forks[p.rightForkId]);
+            addLogEntry(`P${p.id} finished eating and released Forks ${p.leftForkId} & ${p.rightForkId}.`);
+            
+            startThinking(p);
+        }
+
+        startButton.addEventListener('click', () => {
+            clearAllTimeouts();
+            simulationRunning = false; // Stop current processes before re-init
+            // A small delay to ensure timeouts are cleared before init
+            setTimeout(initSimulation, 50); 
+        });
+
+        pauseButton.addEventListener('click', () => {
+            if (!simulationRunning || isPaused) return;
+            isPaused = true;
+            pauseButton.disabled = true;
+            resumeButton.disabled = false;
+            addLogEntry("Simulation paused.");
+
+            philosophers.forEach(p => {
+                if (p.thinkTimeoutId) {
+                    clearTimeout(p.thinkTimeoutId);
+                    p.thinkTimeoutId = null;
+                    p.remainingTime = (p.operationStartTime + THINK_TIME_MAX) - Date.now(); // Approx, could be more precise
+                     if (p.remainingTime < 0) p.remainingTime = 100; // Ensure positive if time elapsed
+                }
+                if (p.eatTimeoutId) {
+                    clearTimeout(p.eatTimeoutId);
+                    p.eatTimeoutId = null;
+                    p.remainingTime = (p.operationStartTime + EAT_TIME_MAX) - Date.now(); // Approx
+                    if (p.remainingTime < 0) p.remainingTime = 100;
+                }
+                if (p.retryTimeoutId) {
+                    clearTimeout(p.retryTimeoutId);
+                    p.retryTimeoutId = null;
+                    // For HUNGRY state, it will retry on resume
+                }
+            });
+        });
+
+        resumeButton.addEventListener('click', () => {
+            if (!simulationRunning || !isPaused) return;
+            isPaused = false;
+            pauseButton.disabled = false;
+            resumeButton.disabled = true;
+            addLogEntry("Simulation resumed.");
+
+            philosophers.forEach(p => {
+                if (p.state === 'THINKING') {
+                    startThinking(p); // remainingTime will be used if set
+                } else if (p.state === 'EATING') {
+                    startEating(p); // remainingTime will be used if set
+                } else if (p.state === 'HUNGRY' || p.state === 'HUNGRY_PENDING_RETRY') {
+                    p.state = 'HUNGRY'; // Ensure correct state
+                    updatePhilosopherUI(p);
+                    tryToEat(p);
+                }
+            });
+        });
+        
+        // Initialize with default number of philosophers on page load
+        // but don't start the simulation automatically.
+        numPhilosophersInput.addEventListener('change', () => {
+            // If simulation is running, changing number implies a restart
+            if (simulationRunning) {
+                addLogEntry("Number of philosophers changed. Click Start/Restart to apply.");
+                clearAllTimeouts();
+                simulationRunning = false;
+                pauseButton.disabled = true;
+                resumeButton.disabled = true;
+            }
+        });
+
+        // Initial state: simulation not running
+        pauseButton.disabled = true;
+        resumeButton.disabled = true;
+        addLogEntry("Welcome! Set number of philosophers (3-8) and click 'Start / Restart'.");
+
+    </script>
+</body>
+</html>

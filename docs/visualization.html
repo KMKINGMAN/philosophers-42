@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophers - Interactive Visualization</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar-fixed">
+        <nav class="deep-purple">
+            <div class="nav-wrapper container">
+                <a href="#!" class="brand-logo">Philosophers</a>
+                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="overview.html">Overview</a></li>
+                    <li><a href="code-explained.html">Code Explained</a></li>
+                    <li class="active"><a href="visualization.html">Visualization</a></li>
+                    <li><a href="documentation.html">Documentation</a></li>
+                    <li><a href="game.html">Game</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <ul class="sidenav" id="mobile-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="overview.html">Overview</a></li>
+        <li><a href="code-explained.html">Code Explained</a></li>
+        <li class="active"><a href="visualization.html">Visualization</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li><a href="game.html">Game</a></li>
+    </ul>
+    
+    <div class="container section">
+        <div class="row">
+            <div class="col s12">
+                <h2 class="deep-purple-text">Interactive Visualization</h2>
+                <div class="divider"></div>
+                <p class="flow-text">This interactive visualization demonstrates how the Dining Philosophers problem works and how our solution prevents deadlocks and starvation.</p>
+            </div>
+        </div>
+        
+        <!-- Visualization Controls -->
+        <div class="row">
+            <div class="col s12">
+                <div class="visualization-controls">
+                    <div class="row valign-wrapper">
+                        <div class="col s12 m4">
+                            <label for="num-philosophers">Number of Philosophers:</label>
+                            <select id="num-philosophers" class="browser-default">
+                                <option value="3">3 Philosophers</option>
+                                <option value="4">4 Philosophers</option>
+                                <option value="5" selected>5 Philosophers</option>
+                                <option value="7">7 Philosophers</option>
+                                <option value="10">10 Philosophers</option>
+                            </select>
+                        </div>
+                        <div class="col s12 m4">
+                            <label for="simulation-speed">Simulation Speed:</label>
+                            <div class="range-field">
+                                <input type="range" id="simulation-speed" min="0.5" max="2" step="0.1" value="1">
+                            </div>
+                        </div>
+                        <div class="col s12 m4 center-align">
+                            <button id="start-simulation" class="btn waves-effect waves-light deep-purple">
+                                Start Simulation
+                                <i class="material-icons right">play_arrow</i>
+                            </button>
+                            <button id="reset-simulation" class="btn waves-effect waves-light red lighten-1">
+                                Reset
+                                <i class="material-icons right">refresh</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Visualization Canvas -->
+            <div class="col s12 m8">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Simulation</span>
+                        <div id="visualization-canvas" class="visualization-container"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Status Panel -->
+            <div class="col s12 m4">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Philosopher Status</span>
+                        <div id="status-container">
+                            <!-- Status will be filled by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Legend Card -->
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Legend</span>
+                        <div class="philosopher-status status-eating">Eating (Has both forks)</div>
+                        <div class="philosopher-status status-thinking">Thinking (No forks)</div>
+                        <div class="philosopher-status status-sleeping">Sleeping (Just finished eating)</div>
+                    </div>
+                </div>
+                
+                <!-- Explanation Card -->
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Deadlock Prevention</span>
+                        <p>Note how even-numbered philosophers take their right fork first, while odd-numbered philosophers take their left fork first. This strategy prevents the circular waiting condition that leads to deadlock.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Additional Explanation -->
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">How This Simulation Works</span>
+                        <p>This visualization implements a simplified version of the dining philosophers solution using the same principles as the C implementation:</p>
+                        
+                        <ul class="collapsible">
+                            <li>
+                                <div class="collapsible-header"><i class="material-icons">filter_1</i>Thread Representation</div>
+                                <div class="collapsible-body">
+                                    <p>Each philosopher is represented by a circle on the visualization. In the actual C code, each philosopher runs in a separate thread that follows the eat-sleep-think lifecycle.</p>
+                                    <p>Clicking on a philosopher will display additional information about their current state.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="collapsible-header"><i class="material-icons">filter_2</i>Fork Management</div>
+                                <div class="collapsible-body">
+                                    <p>Forks are represented by small lines between philosophers. When a fork is in use, it changes color.</p>
+                                    <p>In the C implementation, each fork has a mutex that ensures only one philosopher can access it at a time, preventing race conditions.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="collapsible-header"><i class="material-icons">filter_3</i>Deadlock Prevention</div>
+                                <div class="collapsible-body">
+                                    <p>The simulation uses the same deadlock prevention strategy as the C code:</p>
+                                    <ul class="browser-default">
+                                        <li>Even-numbered philosophers pick up their right fork first, then their left</li>
+                                        <li>Odd-numbered philosophers pick up their left fork first, then their right</li>
+                                    </ul>
+                                    <p>This breaks the circular waiting condition that could lead to deadlock.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="collapsible-header"><i class="material-icons">filter_4</i>State Transitions</div>
+                                <div class="collapsible-body">
+                                    <p>Philosophers cycle through three states, represented by different colors:</p>
+                                    <ul class="browser-default">
+                                        <li><strong>Eating (Green):</strong> Has both forks and is consuming a meal</li>
+                                        <li><strong>Sleeping (Orange):</strong> Has finished eating and is now sleeping</li>
+                                        <li><strong>Thinking (Blue):</strong> Has finished sleeping and is now thinking</li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="page-footer deep-purple">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m6">
+                    <h5 class="white-text">About This Project</h5>
+                    <p class="grey-text text-lighten-4">
+                        This project was developed as part of the 42 curriculum, demonstrating understanding of threads,
+                        mutexes, and concurrent programming principles.
+                    </p>
+                </div>
+                <div class="col s12 m4 offset-m2">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="https://en.wikipedia.org/wiki/Dining_philosophers_problem" target="_blank">Wikipedia: Dining Philosophers Problem</a></li>
+                        <li><a class="grey-text text-lighten-3" href="https://www.42.fr/" target="_blank">42 School</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 Philosophers Project Documentation
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.3.0/browser/pixi.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

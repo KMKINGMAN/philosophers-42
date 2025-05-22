@@ -1,0 +1,126 @@
+// Generate a banner image for the Philosophers project
+// This script creates a canvas that we can use to generate an image
+// Run this in a browser console to generate the image
+
+function generateBanner() {
+    // Create a canvas element
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 400;
+    document.body.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Draw background
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#7b1fa2');     // Deep Purple
+    gradient.addColorStop(1, '#3f51b5');     // Indigo
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add some decorative circles
+    ctx.globalAlpha = 0.1;
+    for (let i = 0; i < 20; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const radius = 20 + Math.random() * 100;
+        
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+    }
+    
+    // Draw table
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, 150, 0, Math.PI * 2);
+    ctx.fillStyle = '#8D6E63';
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, 140, 0, Math.PI * 2);
+    ctx.fillStyle = '#A1887F';
+    ctx.fill();
+    
+    // Draw philosophers and forks
+    const numPhilosophers = 5;
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = 180;
+    
+    for (let i = 0; i < numPhilosophers; i++) {
+        const angle = (i / numPhilosophers) * Math.PI * 2;
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+        
+        // Draw philosopher
+        ctx.beginPath();
+        ctx.arc(x, y, 30, 0, Math.PI * 2);
+        
+        // Different colors for philosophers
+        const colors = ['#FF5252', '#FF4081', '#7C4DFF', '#536DFE', '#18FFFF'];
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 25, 0, Math.PI * 2);
+        ctx.fillStyle = '#F5F5F5';
+        ctx.fill();
+        
+        // Add text
+        ctx.font = '20px Arial';
+        ctx.fillStyle = '#212121';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(i + 1, x, y);
+        
+        // Draw fork
+        const forkAngle = angle + (Math.PI / numPhilosophers);
+        const forkX = centerX + Math.cos(forkAngle) * (radius - 40);
+        const forkY = centerY + Math.sin(forkAngle) * (radius - 40);
+        
+        ctx.save();
+        ctx.translate(forkX, forkY);
+        ctx.rotate(forkAngle);
+        
+        // Fork handle
+        ctx.beginPath();
+        ctx.rect(-5, -25, 10, 50);
+        ctx.fillStyle = '#D7CCC8';
+        ctx.fill();
+        
+        // Fork tines
+        for (let j = -1; j <= 1; j++) {
+            ctx.beginPath();
+            ctx.rect(j * 8, -25, 4, 20);
+            ctx.fillStyle = '#BDBDBD';
+            ctx.fill();
+        }
+        
+        ctx.restore();
+    }
+    
+    // Add title
+    ctx.font = 'bold 60px Arial';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('Dining Philosophers', centerX, 30);
+    
+    ctx.font = '30px Arial';
+    ctx.fillText('A Concurrency Problem Visualization', centerX, 100);
+    
+    // Add table shadow
+    ctx.beginPath();
+    ctx.arc(centerX, centerY + 10, 150, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fill();
+    
+    console.log('Banner generated. Right-click on the canvas and select "Save Image As..." to save it.');
+    return canvas;
+}
+
+// Call this function in a browser to generate and download the banner
+// generateBanner();

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophers - Problem Overview</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar-fixed">
+        <nav class="deep-purple">
+            <div class="nav-wrapper container">
+                <a href="#!" class="brand-logo">Philosophers</a>
+                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="index.html">Home</a></li>
+                    <li class="active"><a href="overview.html">Overview</a></li>
+                    <li><a href="code-explained.html">Code Explained</a></li>
+                    <li><a href="visualization.html">Visualization</a></li>
+                    <li><a href="documentation.html">Documentation</a></li>
+                    <li><a href="game.html">Game</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <ul class="sidenav" id="mobile-nav">
+        <li><a href="index.html">Home</a></li>
+        <li class="active"><a href="overview.html">Overview</a></li>
+        <li><a href="code-explained.html">Code Explained</a></li>
+        <li><a href="visualization.html">Visualization</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li><a href="game.html">Game</a></li>
+    </ul>
+
+    <div class="container section">
+        <div class="row">
+            <div class="col s12">
+                <h2 class="deep-purple-text">The Dining Philosophers Problem</h2>
+                <div class="divider"></div>
+                
+                <div class="card-panel">
+                    <h4>Problem Description</h4>
+                    <div class="flow-text">
+                        <p>The Dining Philosophers problem consists of five philosophers sitting at a round table with one fork between each adjacent philosopher. Each philosopher follows a sequence of actions:</p>
+                        <ul class="browser-default">
+                            <li>Think (do nothing for a while)</li>
+                            <li>Get hungry</li>
+                            <li>Pick up forks (one at a time, in any order)</li>
+                            <li>Eat (for a while)</li>
+                            <li>Put down forks</li>
+                            <li>Repeat</li>
+                        </ul>
+                        <p>The key challenge is that a philosopher cannot eat until they have both their left and right forks, and once a fork is picked up, it is unavailable to others until it is put down.</p>
+                    </div>
+                </div>
+                
+                <div class="card-panel">
+                    <h4>The Problem Setup</h4>
+                    <div class="flow-text">
+                        <p>From the project specification:</p>
+                        <blockquote>
+                            One or more philosophers sit at a round table. There is a large bowl of spaghetti in the middle of the table.
+                        </blockquote>
+                        <blockquote>
+                            The philosophers take turns eating, thinking, and sleeping. While they are eating, they are not thinking nor sleeping; while thinking, they are not eating nor sleeping; and, of course, while sleeping, they are not eating nor thinking.
+                        </blockquote>
+                        <blockquote>
+                            There are also forks on the table. There are as many forks as philosophers. Since eating spaghetti with just one fork is impractical, a philosopher must pick up both the fork to their right and the fork to their left before eating.
+                        </blockquote>
+                        <blockquote>
+                            When a philosopher has finished eating, they put their forks back on the table and start sleeping. Once awake, they start thinking again. The simulation stops when a philosopher dies of starvation.
+                        </blockquote>
+                        <blockquote>
+                            Every philosopher needs to eat and should never starve. Philosophers do not communicate with each other. Philosophers do not know if another philosopher is about to die. Needless to say, philosophers should avoid dying!
+                        </blockquote>
+                    </div>
+                </div>
+                
+                <div class="card-panel">
+                    <h4>The Core Challenges</h4>
+                    <div class="flow-text">
+                        <p>The Dining Philosophers problem illustrates several fundamental challenges in concurrent programming:</p>
+                        
+                        <div class="row">
+                            <div class="col s12 m6">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <span class="card-title deep-purple-text">Deadlock</span>
+                                        <p>If all philosophers simultaneously pick up their left fork and wait for the right fork to become available, the system will deadlock. No philosopher will ever be able to eat because they're all waiting for a resource that will never be released.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col s12 m6">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <span class="card-title deep-purple-text">Starvation</span>
+                                        <p>Some philosophers might never get a chance to eat if the forks are repeatedly taken by their neighbors. The program must ensure all philosophers get to eat within a reasonable timeframe.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col s12 m6">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <span class="card-title deep-purple-text">Race Conditions</span>
+                                        <p>Without proper synchronization, philosophers might try to pick up the same fork at the same time, leading to undefined behavior and potential data corruption.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col s12 m6">
+                                <div class="card">
+                                    <div class="card-content">
+                                        <span class="card-title deep-purple-text">Resource Hierarchy</span>
+                                        <p>Managing shared resources (forks) correctly requires implementing some form of resource ordering or hierarchy to prevent circular wait conditions.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-panel">
+                    <h4>Project Requirements</h4>
+                    <div class="flow-text">
+                        <p>The project has specific requirements for implementation:</p>
+                        <ul class="browser-default">
+                            <li>Each philosopher must be implemented as a separate thread</li>
+                            <li>There is one fork between each pair of philosophers</li>
+                            <li>Each fork's state should be protected with a mutex to prevent duplication</li>
+                            <li>The program must not have data races</li>
+                            <li>Philosophers must avoid dying of starvation</li>
+                        </ul>
+                        <p>The program accepts the following arguments:</p>
+                        <ul class="collection">
+                            <li class="collection-item"><code>number_of_philosophers</code>: The number of philosophers and forks</li>
+                            <li class="collection-item"><code>time_to_die</code>: Milliseconds until a philosopher dies if they haven't started eating</li>
+                            <li class="collection-item"><code>time_to_eat</code>: Milliseconds it takes for a philosopher to eat</li>
+                            <li class="collection-item"><code>time_to_sleep</code>: Milliseconds it takes for a philosopher to sleep</li>
+                            <li class="collection-item"><code>[number_of_times_each_philosopher_must_eat]</code>: Optional argument specifying the minimum number of times each philosopher must eat before the simulation ends</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card-panel">
+                    <h4>Solving the Problem: High-Level Approach</h4>
+                    <div class="flow-text">
+                        <p>Our solution employs several techniques to address the challenges:</p>
+                        
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h5 class="deep-purple-text">Thread Creation</h5>
+                                <p>Each philosopher is represented as a separate thread, with a monitoring thread to check for death conditions.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h5 class="deep-purple-text">Mutex Protection</h5>
+                                <p>Each fork is protected by a mutex to ensure exclusive access.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h5 class="deep-purple-text">Deadlock Prevention</h5>
+                                <p>Philosophers with even IDs take their right fork first, while odd-ID philosophers take their left fork first, breaking the circular wait condition.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h5 class="deep-purple-text">Starvation Monitoring</h5>
+                                <p>A dedicated monitoring thread checks if any philosopher has gone too long without eating.</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h5 class="deep-purple-text">Termination Conditions</h5>
+                                <p>The simulation stops if a philosopher dies or if all philosophers have eaten enough times (when specified).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row center-align">
+            <div class="col s12">
+                <a href="code-explained.html" class="btn-large deep-purple waves-effect waves-light">Explore the Code Implementation</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="page-footer deep-purple">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m6">
+                    <h5 class="white-text">About This Project</h5>
+                    <p class="grey-text text-lighten-4">
+                        This project was developed as part of the 42 curriculum, demonstrating understanding of threads,
+                        mutexes, and concurrent programming principles.
+                    </p>
+                </div>
+                <div class="col s12 m4 offset-m2">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="https://en.wikipedia.org/wiki/Dining_philosophers_problem" target="_blank">Wikipedia: Dining Philosophers Problem</a></li>
+                        <li><a class="grey-text text-lighten-3" href="https://www.42.fr/" target="_blank">42 School</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 Philosophers Project Documentation
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophers - Documentation</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Prism.js for code highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar-fixed">
+        <nav class="deep-purple">
+            <div class="nav-wrapper container">
+                <a href="#!" class="brand-logo">Philosophers</a>
+                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="overview.html">Overview</a></li>
+                    <li><a href="code-explained.html">Code Explained</a></li>
+                    <li><a href="visualization.html">Visualization</a></li>
+                    <li class="active"><a href="documentation.html">Documentation</a></li>
+                    <li><a href="game.html">Game</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <ul class="sidenav" id="mobile-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="overview.html">Overview</a></li>
+        <li><a href="code-explained.html">Code Explained</a></li>
+        <li><a href="visualization.html">Visualization</a></li>
+        <li class="active"><a href="documentation.html">Documentation</a></li>
+        <li><a href="game.html">Game</a></li>
+    </ul>
+    
+    <div class="container section">
+        <div class="row">
+            <div class="col s12">
+                <h2 class="deep-purple-text">API Documentation</h2>
+                <div class="divider"></div>
+                <p class="flow-text">This page provides detailed documentation of all the functions and data structures used in the philosophers project.</p>
+            </div>
+        </div>
+        
+        <!-- Documentation Content -->
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col s12 m3">
+                <div class="collection with-header">
+                    <div class="collection-header"><h5>Contents</h5></div>
+                    <a href="#data-structures" class="collection-item">Data Structures</a>
+                    <a href="#core-functions" class="collection-item">Core Functions</a>
+                    <a href="#philosopher-actions" class="collection-item">Philosopher Actions</a>
+                    <a href="#monitor-functions" class="collection-item">Monitor Functions</a>
+                    <a href="#utility-functions" class="collection-item">Utility Functions</a>
+                    <a href="#thread-management" class="collection-item">Thread Management</a>
+                    <a href="#cleanup-functions" class="collection-item">Cleanup Functions</a>
+                </div>
+                
+                <div class="card-panel teal lighten-4">
+                    <p><i class="material-icons left">info</i> Click on any function name to see its detailed documentation.</p>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col s12 m9">
+                <!-- Data Structures -->
+                <section id="data-structures" class="scrollspy">
+                    <div class="card-panel">
+                        <h4>Data Structures</h4>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">t_fork</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">typedef struct s_fork
+{
+    pthread_mutex_t  mutex;  // Mutex to control access to this fork
+    int              id;     // Unique identifier for this fork
+} t_fork;</code></pre>
+                            </div>
+                            <p>Represents a fork on the table. Each fork has a mutex that ensures only one philosopher can use it at a time.</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">t_philo</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">typedef struct s_philo
+{
+    int             id;             // Unique identifier for this philosopher
+    int             meals_eaten;    // Number of meals this philosopher has eaten
+    int             eating;         // Flag indicating if philosopher is currently eating
+    long long       last_meal_time; // Timestamp of last meal start
+    pthread_t       thread;         // Thread identifier for this philosopher
+    t_fork          *left_fork;     // Pointer to left fork
+    t_fork          *right_fork;    // Pointer to right fork
+    pthread_mutex_t meal_mutex;     // Mutex to protect meal-related data
+    t_data          *data;          // Pointer to shared data structure
+} t_philo;</code></pre>
+                            </div>
+                            <p>Represents a philosopher and their state. Each philosopher runs in a separate thread and has pointers to their left and right forks.</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">t_data</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">typedef struct s_data
+{
+    int             num_philosophers; // Number of philosophers/forks
+    int             time_to_die;      // Time in ms until a philosopher dies if they haven't eaten
+    int             time_to_eat;      // Time in ms it takes to eat
+    int             time_to_sleep;    // Time in ms it takes to sleep
+    int             must_eat_count;   // Optional: number of times each philosopher must eat
+    int             all_threads_ready;// Flag for thread synchronization
+    int             simulation_stop;  // Flag to signal end of simulation
+    long long       start_time;       // Time when simulation started
+    t_philo         *philosophers;    // Array of philosopher structures
+    t_fork          *forks;           // Array of fork structures
+    pthread_mutex_t print_mutex;      // Mutex for synchronized console output
+    pthread_mutex_t state_mutex;      // Mutex for protecting shared state variables
+} t_data;</code></pre>
+                            </div>
+                            <p>Contains all shared data for the simulation. Includes configuration parameters, synchronization flags, and arrays of philosophers and forks.</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Core Functions -->
+                <section id="core-functions" class="scrollspy">
+                    <div class="card-panel">
+                        <h4>Core Functions</h4>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">main</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">int main(int argc, char **argv)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Program entry point. Validates arguments, initializes the simulation, and manages the overall program flow.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>argc</code>: Argument count (should be 5 or 6)</li>
+                                <li><code>argv</code>: Array of argument strings</li>
+                            </ul>
+                            <p><strong>Returns:</strong> 0 on success, 1 on failure</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">init_data</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">int init_data(t_data *data, int argc, char **argv)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Initializes the main data structure with command-line arguments and allocates memory for philosophers and forks.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>data</code>: Pointer to data structure to initialize</li>
+                                <li><code>argc</code>: Argument count</li>
+                                <li><code>argv</code>: Array of argument strings</li>
+                            </ul>
+                            <p><strong>Returns:</strong> SUCCESS or FAILURE</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">create_threads</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">int create_threads(t_data *data)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Creates threads for all philosophers and the monitor, initializes meal times, and synchronizes thread startup.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>data</code>: Pointer to main data structure</li>
+                            </ul>
+                            <p><strong>Returns:</strong> SUCCESS or FAILURE</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Philosopher Actions -->
+                <section id="philosopher-actions" class="scrollspy">
+                    <div class="card-panel">
+                        <h4>Philosopher Actions</h4>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">philosopher_routine</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">void *philosopher_routine(void *arg)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Main function executed by each philosopher thread. Manages the philosopher's lifecycle of eating, sleeping, and thinking.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>arg</code>: Void pointer to philosopher structure (t_philo)</li>
+                            </ul>
+                            <p><strong>Returns:</strong> NULL</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">philo_eat</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">int philo_eat(t_philo *philo)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Handles the eating action for a philosopher. Acquires forks, updates meal time and count, and releases forks.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>philo</code>: Pointer to philosopher structure</li>
+                            </ul>
+                            <p><strong>Returns:</strong> 1 on success, 0 if simulation should stop</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">philo_sleep</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">int philo_sleep(t_philo *philo)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Handles the sleeping action for a philosopher.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>philo</code>: Pointer to philosopher structure</li>
+                            </ul>
+                            <p><strong>Returns:</strong> 1 on success, 0 if simulation should stop</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">philo_think</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">int philo_think(t_philo *philo)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Handles the thinking action for a philosopher.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>philo</code>: Pointer to philosopher structure</li>
+                            </ul>
+                            <p><strong>Returns:</strong> 1 on success, 0 if simulation should stop</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">setup_forks</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">static void setup_forks(t_philo *philo, t_fork **first, t_fork **second)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Sets up fork order based on philosopher ID to prevent deadlocks.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>philo</code>: Pointer to philosopher structure</li>
+                                <li><code>first</code>: Pointer to store the first fork to grab</li>
+                                <li><code>second</code>: Pointer to store the second fork to grab</li>
+                            </ul>
+                            <p><strong>Returns:</strong> void</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Monitor Functions -->
+                <section id="monitor-functions" class="scrollspy">
+                    <div class="card-panel">
+                        <h4>Monitor Functions</h4>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">monitor_routine</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">void *monitor_routine(void *arg)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Main function for the monitor thread. Checks for philosopher death or meal completion.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>arg</code>: Void pointer to main data structure (t_data)</li>
+                            </ul>
+                            <p><strong>Returns:</strong> NULL</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">check_philo_death</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">static int check_philo_death(t_data *data, t_philo *philos, int i)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Checks if a specific philosopher has died of starvation.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>data</code>: Pointer to main data structure</li>
+                                <li><code>philos</code>: Array of philosopher structures</li>
+                                <li><code>i</code>: Index of philosopher to check</li>
+                            </ul>
+                            <p><strong>Returns:</strong> 1 if philosopher has died, 0 otherwise</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">check_all_philos</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">static int check_all_philos(t_data *data, t_philo *philos)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Checks all philosophers to see if any have died.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>data</code>: Pointer to main data structure</li>
+                                <li><code>philos</code>: Array of philosopher structures</li>
+                            </ul>
+                            <p><strong>Returns:</strong> 1 if any philosopher has died, 0 otherwise</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">check_if_all_ate</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">static int check_if_all_ate(t_data *data, t_philo *philos)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Checks if all philosophers have eaten enough times.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>data</code>: Pointer to main data structure</li>
+                                <li><code>philos</code>: Array of philosopher structures</li>
+                            </ul>
+                            <p><strong>Returns:</strong> 1 if all philosophers have eaten enough, 0 otherwise</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Utility Functions -->
+                <section id="utility-functions" class="scrollspy">
+                    <div class="card-panel">
+                        <h4>Utility Functions</h4>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">get_time</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">long long get_time(void)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Gets the current time in milliseconds.</p>
+                            <p><strong>Parameters:</strong> None</p>
+                            <p><strong>Returns:</strong> Current time in milliseconds since epoch</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">precise_sleep</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">void precise_sleep(long long time_in_ms)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Sleeps for a specified amount of time with high precision.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>time_in_ms</code>: Time to sleep in milliseconds</li>
+                            </ul>
+                            <p><strong>Returns:</strong> void</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">print_status</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">void print_status(t_philo *philo, char *status)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Prints the status of a philosopher with appropriate synchronization.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>philo</code>: Pointer to philosopher structure</li>
+                                <li><code>status</code>: String describing the philosopher's current action</li>
+                            </ul>
+                            <p><strong>Returns:</strong> void</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">ft_atoi</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">int ft_atoi(const char *str)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Converts a string to an integer.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>str</code>: String to convert</li>
+                            </ul>
+                            <p><strong>Returns:</strong> Integer value</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">ft_isdigit</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">int ft_isdigit(int c)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Checks if a character is a digit.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>c</code>: Character to check</li>
+                            </ul>
+                            <p><strong>Returns:</strong> 1 if character is a digit, 0 otherwise</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Thread Management -->
+                <section id="thread-management" class="scrollspy">
+                    <div class="card-panel">
+                        <h4>Thread Management</h4>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">wait_for_threads_ready</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">static void wait_for_threads_ready(t_data *data)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Makes the monitor thread wait until all threads are ready.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>data</code>: Pointer to main data structure</li>
+                            </ul>
+                            <p><strong>Returns:</strong> void</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">wait_for_all_threads</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">static void wait_for_all_threads(t_philo *philo)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Makes a philosopher thread wait until all threads are ready.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>philo</code>: Pointer to philosopher structure</li>
+                            </ul>
+                            <p><strong>Returns:</strong> void</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">init_philo_threads</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">static int init_philo_threads(t_data *data, pthread_t *monitor)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Creates threads for all philosophers and the monitor.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>data</code>: Pointer to main data structure</li>
+                                <li><code>monitor</code>: Pointer to monitor thread identifier</li>
+                            </ul>
+                            <p><strong>Returns:</strong> SUCCESS if all threads created, FAILURE otherwise</p>
+                        </div>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">init_meal_times</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">static int init_meal_times(t_data *data)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Initializes the last meal time for all philosophers.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>data</code>: Pointer to main data structure</li>
+                            </ul>
+                            <p><strong>Returns:</strong> SUCCESS always</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Cleanup Functions -->
+                <section id="cleanup-functions" class="scrollspy">
+                    <div class="card-panel">
+                        <h4>Cleanup Functions</h4>
+                        
+                        <div class="function-block">
+                            <h5 class="deep-purple-text">free_data</h5>
+                            <div class="code-highlight">
+                                <pre><code class="language-c">void free_data(t_data *data)</code></pre>
+                            </div>
+                            <p><strong>Description:</strong> Frees all allocated memory and destroys mutexes.</p>
+                            <p><strong>Parameters:</strong></p>
+                            <ul class="browser-default">
+                                <li><code>data</code>: Pointer to main data structure</li>
+                            </ul>
+                            <p><strong>Returns:</strong> void</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="page-footer deep-purple">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m6">
+                    <h5 class="white-text">About This Project</h5>
+                    <p class="grey-text text-lighten-4">
+                        This project was developed as part of the 42 curriculum, demonstrating understanding of threads,
+                        mutexes, and concurrent programming principles.
+                    </p>
+                </div>
+                <div class="col s12 m4 offset-m2">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="https://en.wikipedia.org/wiki/Dining_philosophers_problem" target="_blank">Wikipedia: Dining Philosophers Problem</a></li>
+                        <li><a class="grey-text text-lighten-3" href="https://www.42.fr/" target="_blank">42 School</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 Philosophers Project Documentation
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

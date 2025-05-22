@@ -3,1150 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Dining Philosophers Problem - Implementation</title>
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --text-color: #333;
-            --bg-color: #f9f9f9;
-            --code-bg: #f0f0f0;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            padding: 40px 0;
-            margin-bottom: 30px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 8px;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        h2 {
-            font-size: 1.8rem;
-            color: var(--primary-color);
-            margin: 30px 0 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--secondary-color);
-        }
-        
-        h3 {
-            font-size: 1.4rem;
-            color: var(--primary-color);
-            margin: 24px 0 12px;
-        }
-        
-        p {
-            margin-bottom: 16px;
-        }
-        
-        code {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: var(--code-bg);
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-size: 0.9em;
-        }
-        
-        pre {
-            background-color: var(--code-bg);
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            margin: 15px 0;
-        }
-        
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .diagram {
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .diagram img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        
-        .toc {
-            background-color: #f5f5f5;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 30px;
-        }
-        
-        .toc h3 {
-            margin-top: 0;
-        }
-        
-        .toc ul {
-            list-style-type: none;
-        }
-        
-        .toc li {
-            margin-bottom: 8px;
-        }
-        
-        .toc a {
-            color: var(--secondary-color);
-            text-decoration: none;
-        }
-        
-        .toc a:hover {
-            text-decoration: underline;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        th {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        
-        .code-block {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #2c3e50;
-            color: #ecf0f1;
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            margin: 15px 0;
-        }
-        
-        .status {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 0.8em;
-            margin-left: 8px;
-            font-weight: bold;
-        }
-        
-        .eating {
-            background-color: #2ecc71;
-            color: white;
-        }
-        
-        .thinking {
-            background-color: #9b59b6;
-            color: white;
-        }
-        
-        .sleeping {
-            background-color: #3498db;
-            color: white;
-        }
-        
-        .dead {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        .timeline {
-            position: relative;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px 0;
-        }
-        
-        .timeline::after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            background-color: var(--primary-color);
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            margin-left: -3px;
-        }
-        
-        .timeline-item {
-            padding: 10px 40px;
-            position: relative;
-            width: 50%;
-        }
-        
-        .timeline-item::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: white;
-            border: 4px solid var(--secondary-color);
-            top: 15px;
-            border-radius: 50%;
-            z-index: 1;
-        }
-        
-        .left {
-            left: 0;
-        }
-        
-        .right {
-            left: 50%;
-        }
-        
-        .left::after {
-            right: -10px;
-        }
-        
-        .right::after {
-            left: -10px;
-        }
-        
-        .timeline-content {
-            padding: 20px;
-            background-color: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .timeline-content h3 {
-            margin-top: 0;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 40px;
-            color: #777;
-            font-size: 0.9rem;
-        }
-        
-        /* Interactive simulation */
-        .simulation {
-            text-align: center;
-            margin: 40px 0;
-        }
-        
-        .table-circle {
-            width: 300px;
-            height: 300px;
-            background-color: #795548;
-            border-radius: 50%;
-            position: relative;
-            margin: 0 auto 30px;
-        }
-        
-        .philosopher {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #3498db;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            transition: background-color 0.5s;
-        }
-        
-        .fork {
-            position: absolute;
-            width: 10px;
-            height: 40px;
-            background-color: #95a5a6;
-            transform-origin: bottom center;
-            border-radius: 2px;
-        }
-        
-        .used-fork {
-            background-color: #f1c40f;
-        }
-        
-        /* Responsive CSS */
-        @media (max-width: 768px) {
-            header {
-                padding: 30px 10px;
-            }
-            
-            .container {
-                padding: 20px 15px;
-            }
-            
-            h1 {
-                font-size: 2rem;
-            }
-            
-            h2 {
-                font-size: 1.5rem;
-            }
-            
-            .timeline::after {
-                left: 31px;
-            }
-            
-            .timeline-item {
-                width: 100%;
-                padding-left: 70px;
-                padding-right: 25px;
-            }
-            
-            .timeline-item::after {
-                left: 15px;
-            }
-            
-            .left::after, .right::after {
-                left: 15px;
-            }
-            
-            .right {
-                left: 0%;
-            }
-        }
-    </style>
+    <title>Philosophers - Dining Philosophers Problem</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <h1>The Dining Philosophers Problem</h1>
-        <p>An Implementation in C with POSIX Threads</p>
-    </header>
-    
-    <div class="container">
-        <div class="toc">
-            <h3>Table of Contents</h3>
-            <ul>
-                <li><a href="#introduction">Introduction</a></li>
-                <li><a href="#problem">The Problem Statement</a></li>
-                <li><a href="#unix">UNIX Fundamentals</a></li>
-                <li><a href="#implementation">Implementation</a></li>
-                <li><a href="#code-structure">Code Structure</a></li>
-                <li><a href="#visualization">Visualization</a></li>
-                <li><a href="#deadlock">Deadlock Prevention</a></li>
-                <li><a href="#race-conditions">Race Conditions</a></li>
-                <li><a href="#code-explanation">Code Explanation</a></li>
-                <li><a href="#running">Running the Program</a></li>
-                <li><a href="#conclusion">Conclusion</a></li>
-            </ul>
-        </div>
-        
-        <section id="introduction">
-            <h2>Introduction</h2>
-            <p>
-                The Dining Philosophers problem is a classic example in computer science used to illustrate synchronization issues and techniques for resolving them. It was originally formulated in 1965 by E. W. Dijkstra as a student exam exercise and later developed by Tony Hoare. This problem is widely used to teach the concepts of deadlock, starvation, and resource allocation in concurrent programming.
-            </p>
-            <p>
-                This implementation uses C programming language and POSIX threads (pthreads) to create a solution to the dining philosophers problem that avoids deadlock and ensures that no philosopher will starve to death.
-            </p>
-        </section>
-        
-        <section id="problem">
-            <h2>The Problem Statement</h2>
-            <p>
-                Five philosophers sit at a round table, alternating between thinking and eating. In the center of the table is a bowl of spaghetti. Each philosopher needs two forks to eat, but there are only five forks available (one between each pair of philosophers). The challenge is to design a concurrent algorithm such that:
-            </p>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li>No philosopher will starve (they must be able to eat eventually)</li>
-                <li>System deadlock is avoided (philosophers don't just wait for forks indefinitely)</li>
-                <li>Maximum concurrency is allowed (philosophers who don't need the same forks can eat simultaneously)</li>
-            </ul>
-            
-            <div class="diagram">
-                <svg width="400" height="300" viewBox="0 0 400 300">
-                    <!-- Table -->
-                    <circle cx="200" cy="150" r="100" fill="#8D6E63" />
-                    
-                    <!-- Philosophers -->
-                    <circle cx="200" cy="50" r="30" fill="#3498db" />
-                    <text x="200" y="55" text-anchor="middle" fill="white" font-weight="bold">P1</text>
-                    
-                    <circle cx="284" cy="107" r="30" fill="#3498db" />
-                    <text x="284" y="112" text-anchor="middle" fill="white" font-weight="bold">P2</text>
-                    
-                    <circle cx="254" cy="227" r="30" fill="#3498db" />
-                    <text x="254" y="232" text-anchor="middle" fill="white" font-weight="bold">P3</text>
-                    
-                    <circle cx="146" cy="227" r="30" fill="#3498db" />
-                    <text x="146" y="232" text-anchor="middle" fill="white" font-weight="bold">P4</text>
-                    
-                    <circle cx="116" cy="107" r="30" fill="#3498db" />
-                    <text x="116" y="112" text-anchor="middle" fill="white" font-weight="bold">P5</text>
-                    
-                    <!-- Forks -->
-                    <rect x="190" y="75" width="6" height="30" rx="2" fill="#95a5a6" transform="rotate(-30 190 75)" />
-                    <rect x="252" y="120" width="6" height="30" rx="2" fill="#95a5a6" transform="rotate(30 252 120)" />
-                    <rect x="245" y="185" width="6" height="30" rx="2" fill="#95a5a6" transform="rotate(90 245 185)" />
-                    <rect x="160" y="195" width="6" height="30" rx="2" fill="#95a5a6" transform="rotate(150 160 195)" />
-                    <rect x="140" y="120" width="6" height="30" rx="2" fill="#95a5a6" transform="rotate(210 140 120)" />
-                </svg>
+    <!-- Navigation -->
+    <div class="navbar-fixed">
+        <nav class="deep-purple">
+            <div class="nav-wrapper container">
+                <a href="#!" class="brand-logo">Philosophers</a>
+                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="overview.html">Overview</a></li>
+                    <li><a href="code-explained.html">Code Explained</a></li>
+                    <li><a href="visualization.html">Visualization</a></li>
+                    <li><a href="documentation.html">Documentation</a></li>
+                    <li><a href="game.html">Game</a></li>
+                    <li><a href="learning-paths.html">Learning Paths</a></li>
+                </ul>
             </div>
-        </section>
-        
-        <section id="unix">
-            <h2>UNIX Fundamentals</h2>
-            <h3>Threads</h3>
-            <p>
-                Threads are independent sequences of execution that share the same process resources. In our implementation, each philosopher is represented by a thread, allowing them to run concurrently within the same program.
-            </p>
-            <p>
-                POSIX threads (pthreads) is a standardized programming interface for creating and manipulating threads in a Unix-like environment. The key pthread functions we use are:
-            </p>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li><code>pthread_create</code>: Creates a new thread</li>
-                <li><code>pthread_join</code>: Waits for a thread to terminate</li>
-                <li><code>pthread_mutex_init</code>: Initializes a mutex</li>
-                <li><code>pthread_mutex_lock</code>: Locks a mutex</li>
-                <li><code>pthread_mutex_unlock</code>: Unlocks a mutex</li>
-            </ul>
-            
-            <h3>Mutexes (Mutual Exclusion)</h3>
-            <p>
-                A mutex is a synchronization primitive used to protect shared resources from concurrent access. In our implementation, each fork is protected by a mutex to ensure that only one philosopher can hold it at any time.
-            </p>
-            <p>
-                Mutexes are crucial in preventing race conditions, which occur when multiple threads access shared data concurrently and at least one thread modifies it.
-            </p>
-            
-            <h3>Race Conditions and Deadlocks</h3>
-            <p>
-                <strong>Race condition</strong>: Occurs when the behavior of a program depends on the relative timing of events, such as when two threads access the same resource simultaneously. In our context, this might happen if two philosophers try to read or update a shared value without proper synchronization.
-            </p>
-            <p>
-                <strong>Deadlock</strong>: A situation where two or more threads are unable to proceed because each is waiting for a resource held by another. In the dining philosophers context, this can happen if each philosopher picks up their left fork and waits indefinitely for their right fork to become available.
-            </p>
-            
-            <h3>Time Management</h3>
-            <p>
-                In Unix systems, time is typically measured using functions like <code>gettimeofday()</code>, which returns the current time with microsecond precision. Our program uses this to track when philosophers eat, sleep, and potentially die of starvation.
-            </p>
-        </section>
-        
-        <section id="implementation">
-            <h2>Implementation</h2>
-            <p>
-                Our implementation of the dining philosophers problem consists of several key components:
-            </p>
-            
-            <h3>Data Structures</h3>
-            <p>
-                We use three main structures to represent the simulation:
-            </p>
-            <pre><code>/* Fork representation */
-typedef struct s_fork
-{
-    pthread_mutex_t	mutex;
-    int				id;
-}	t_fork;
-
-/* Philosopher representation */
-typedef struct s_philo
-{
-    int				id;
-    int				meals_eaten;
-    int				eating;
-    long long		last_meal_time;
-    pthread_t		thread;
-    t_fork			*left_fork;
-    t_fork			*right_fork;
-    pthread_mutex_t	meal_mutex;
-    t_data			*data;
-}	t_philo;
-
-/* Shared data for the simulation */
-typedef struct s_data
-{
-    int				num_philosophers;
-    int				time_to_die;
-    int				time_to_eat;
-    int				time_to_sleep;
-    int				must_eat_count;
-    int				all_threads_ready;
-    int				simulation_stop;
-    long long		start_time;
-    t_philo			*philosophers;
-    t_fork			*forks;
-    pthread_mutex_t	print_mutex;
-    pthread_mutex_t	state_mutex;
-}	t_data;</code></pre>
-            
-            <h3>Initialization</h3>
-            <p>
-                The program starts by initializing the data structures based on the command-line arguments:
-            </p>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li>Number of philosophers</li>
-                <li>Time to die (in milliseconds)</li>
-                <li>Time to eat (in milliseconds)</li>
-                <li>Time to sleep (in milliseconds)</li>
-                <li>Optional: Number of times each philosopher must eat</li>
-            </ul>
-            
-            <h3>Philosopher Lifecycle</h3>
-            <p>
-                Each philosopher follows this cycle:
-            </p>
-            <div class="timeline">
-                <div class="timeline-item left">
-                    <div class="timeline-content">
-                        <h3>1. Taking Forks</h3>
-                        <p>Philosopher attempts to pick up their forks (one at a time)</p>
-                    </div>
-                </div>
-                <div class="timeline-item right">
-                    <div class="timeline-content">
-                        <h3>2. Eating</h3>
-                        <p>When both forks are acquired, philosopher eats for a specified time</p>
-                    </div>
-                </div>
-                <div class="timeline-item left">
-                    <div class="timeline-content">
-                        <h3>3. Putting Down Forks</h3>
-                        <p>Philosopher releases both forks after eating</p>
-                    </div>
-                </div>
-                <div class="timeline-item right">
-                    <div class="timeline-content">
-                        <h3>4. Sleeping</h3>
-                        <p>Philosopher sleeps for a specified time</p>
-                    </div>
-                </div>
-                <div class="timeline-item left">
-                    <div class="timeline-content">
-                        <h3>5. Thinking</h3>
-                        <p>Philosopher thinks until they can eat again</p>
-                    </div>
-                </div>
-            </div>
-            
-            <h3>Death Monitor</h3>
-            <p>
-                A separate monitor thread checks continuously:
-            </p>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li>If any philosopher has gone too long without eating (died of starvation)</li>
-                <li>If all philosophers have eaten the required number of times (if specified)</li>
-            </ul>
-        </section>
-        
-        <section id="code-structure">
-            <h2>Code Structure</h2>
-            <p>
-                Our implementation is organized into several logical sections:
-            </p>
-            
-            <h3>Utility Functions</h3>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li><code>ft_atoi</code>: Converts a string to an integer</li>
-                <li><code>get_time</code>: Gets the current time in milliseconds</li>
-                <li><code>precise_sleep</code>: A more precise sleep function than standard <code>usleep</code></li>
-                <li><code>print_status</code>: Safely prints the status of philosophers</li>
-            </ul>
-            
-            <h3>Initialization Functions</h3>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li><code>init_data</code>: Initializes simulation parameters</li>
-                <li><code>init_philosophers</code>: Creates and initializes philosopher structures</li>
-                <li><code>init_forks</code>: Creates and initializes fork structures</li>
-            </ul>
-            
-            <h3>Philosopher Actions</h3>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li><code>philo_eat</code>: Handles the eating process</li>
-                <li><code>philo_sleep</code>: Handles the sleeping process</li>
-                <li><code>philo_think</code>: Handles the thinking process</li>
-            </ul>
-            
-            <h3>Thread Routines</h3>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li><code>philosopher_routine</code>: The main function each philosopher thread executes</li>
-                <li><code>monitor_routine</code>: Monitors the health and meal status of all philosophers</li>
-            </ul>
-            
-            <h3>Thread Management</h3>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li><code>create_threads</code>: Creates threads for philosophers and the monitor</li>
-            </ul>
-            
-            <h3>Cleanup</h3>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li><code>free_data</code>: Frees all allocated memory and destroys mutexes</li>
-            </ul>
-        </section>
-        
-        <section id="deadlock">
-            <h2>Deadlock Prevention</h2>
-            <p>
-                Our implementation prevents deadlock using several techniques:
-            </p>
-            <p>
-                <strong>1. Asymmetric Fork Acquisition:</strong> Even-numbered philosophers take their right fork first, while odd-numbered philosophers take their left fork first. This breaks the circular wait condition that could lead to deadlock.
-            </p>
-            <div class="code-block">
-                if (philo->id % 2 == 0) {
-                    first_fork = philo->right_fork;
-                    second_fork = philo->left_fork;
-                } else {
-                    first_fork = philo->left_fork;
-                    second_fork = philo->right_fork;
-                }
-            </div>
-            <p>
-                <strong>2. Immediate Release:</strong> Philosophers release both forks as soon as they finish eating, not holding onto resources they don't need.
-            </p>
-            <p>
-                <strong>3. Consistent Lock Order:</strong> When multiple mutexes need to be acquired (such as by the monitor thread), they are always acquired in the same order to prevent deadlock between threads.
-            </p>
-        </section>
-        
-        <section id="race-conditions">
-            <h2>Race Conditions</h2>
-            <p>
-                Our code prevents race conditions through careful mutex usage:
-            </p>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li>Each fork has its own mutex to prevent multiple philosophers from using it simultaneously</li>
-                <li>A <code>meal_mutex</code> protects access to each philosopher's meal-related data</li>
-                <li>A <code>print_mutex</code> ensures that status messages are printed atomically</li>
-                <li>A <code>state_mutex</code> protects the shared simulation state</li>
-            </ul>
-            <p>
-                For example, when checking if a philosopher has died:
-            </p>
-            <div class="code-block">
-                </br>pthread_mutex_lock(&philos[i].meal_mutex);
-                </br>current_time = get_time();
-                </br>if (!philos[i].eating && (current_time - philos[i].last_meal_time) >= data->time_to_die)
-                </br>{
-                </br>    pthread_mutex_unlock(&philos[i].meal_mutex);
-                </br>    
-                </br>    pthread_mutex_lock(&data->print_mutex);
-                </br>    pthread_mutex_lock(&data->state_mutex);
-                </br>    
-                </br>    data->simulation_stop = 1;
-                </br>    printf("%lld %d died\n", get_time() - data->start_time, philos[i].id);
-                </br>    
-                </br>    pthread_mutex_unlock(&data->state_mutex);
-                </br>    pthread_mutex_unlock(&data->print_mutex);
-                </br>    return (NULL);
-                </br>}
-                </br>pthread_mutex_unlock(&philos[i].meal_mutex);
-            </div>
-        </section>
-        
-        <section id="code-explanation">
-            <h2>Code Explanation</h2>
-            <p>
-                Let's take a detailed look at the key parts of the implementation:
-            </p>
-            
-            <h3>Time Management</h3>
-            <div class="code-block">
-</br>long long	get_time(void)
-</br>{
-</br>	struct timeval	tv;
-</br>
-</br>	gettimeofday(&tv, NULL);
-</br>	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
-</br>}
-</br>
-</br>void	precise_sleep(long long time_in_ms)
-</br>{
-</br>	long long	start_time;
-</br>
-</br>	start_time = get_time();
-</br>	while ((get_time() - start_time) < time_in_ms)
-</br>		usleep(100);
-</br>}
-            </div>
-            <p>
-                The <code>get_time()</code> function uses <code>gettimeofday()</code> to get the current time in milliseconds. 
-                This is crucial for tracking when philosophers last ate and for determining if they've starved.
-            </p>
-            <p>
-                The <code>precise_sleep()</code> function implements a more accurate sleep than directly using <code>usleep()</code>.
-                It actively checks the time elapsed in short intervals (busy waiting) rather than relying solely on the system's sleep function, which may be less precise.
-            </p>
-            
-            <h3>Philosopher's Eating Logic</h3>
-            <div class="code-block">
-</br>int	philo_eat(t_philo *philo)
-</br>{
-</br>	t_fork	*first_fork;
-</br>	t_fork	*second_fork;
-</br>
-</br>	// To prevent deadlock, even philosophers take right fork first, odd take left fork first
-</br>	if (philo->id % 2 == 0)
-</br>	{
-</br>		first_fork = philo->right_fork;
-</br>		second_fork = philo->left_fork;
-</br>	}
-</br>	else
-</br>	{
-</br>		first_fork = philo->left_fork;
-</br>		second_fork = philo->right_fork;
-</br>	}
-</br>
-</br>	pthread_mutex_lock(&first_fork->mutex);
-</br>	print_status(philo, "has taken a fork");
-</br>
-</br>	// If there's only one philosopher
-</br>	if (philo->data->num_philosophers == 1)
-</br>	{
-</br>		pthread_mutex_unlock(&first_fork->mutex);
-</br>		precise_sleep(philo->data->time_to_die);
-</br>		return (FAILURE);
-</br>	}
-</br>
-</br>	pthread_mutex_lock(&second_fork->mutex);
-</br>	print_status(philo, "has taken a fork");
-</br>
-</br>	pthread_mutex_lock(&philo->meal_mutex);
-</br>	philo->eating = 1;
-</br>	philo->last_meal_time = get_time();
-</br>	pthread_mutex_unlock(&philo->meal_mutex);
-</br>
-</br>	print_status(philo, "is eating");
-</br>	precise_sleep(philo->data->time_to_eat);
-</br>
-</br>	pthread_mutex_lock(&philo->meal_mutex);
-</br>	philo->eating = 0;
-</br>	philo->meals_eaten++;
-</br>	pthread_mutex_unlock(&philo->meal_mutex);
-</br>
-</br>	pthread_mutex_unlock(&second_fork->mutex);
-</br>	pthread_mutex_unlock(&first_fork->mutex);
-</br>
-</br>	return (SUCCESS);
-</br>}
-            </div>
-            <p>
-                The <code>philo_eat()</code> function handles the philosopher's eating process:
-            </p>
-            <ol style="margin-left: 30px; margin-bottom: 20px;">
-                <li>It determines which fork to pick up first based on philosopher ID (even or odd) to prevent deadlock</li>
-                <li>It handles the special case of a single philosopher by releasing the fork and waiting until death</li>
-                <li>It acquires both forks and marks the philosopher as eating</li>
-                <li>It updates the last_meal_time when eating begins</li>
-                <li>After eating for time_to_eat milliseconds, it updates the meal count and releases both forks</li>
-            </ol>
-            
-            <h3>Death Monitor Implementation</h3>
-            <div class="code-block">
-</br>void	*monitor_routine(void *arg)
-</br>{
-</br>	t_data		*data;
-</br>	t_philo		*philos;
-</br>	int			i;
-</br>	long long	current_time;
-</br>
-</br>	data = (t_data *)arg;
-</br>	philos = data->philosophers;
-</br>
-</br>	// Wait until all threads start
-</br>	while (!data->all_threads_ready)
-</br>		usleep(100);
-</br>	
-</br>	usleep(1000); // Small delay to ensure philosophers have started
-</br>
-</br>	while (1)
-</br>	{
-</br>		i = 0;
-</br>		// Check if all philosophers have eaten enough
-</br>		if (data->must_eat_count != -1)
-</br>		{
-</br>			int all_ate_enough = 1;
-</br>			for (int j = 0; j < data->num_philosophers; j++)
-</br>			{
-</br>				pthread_mutex_lock(&philos[j].meal_mutex);
-</br>				if (philos[j].meals_eaten < data->must_eat_count)
-</br>				{
-</br>					all_ate_enough = 0;
-</br>					pthread_mutex_unlock(&philos[j].meal_mutex);
-</br>					break;
-</br>				}
-</br>				pthread_mutex_unlock(&philos[j].meal_mutex);
-</br>			}
-</br>			
-</br>			if (all_ate_enough)
-</br>			{
-</br>				pthread_mutex_lock(&data->print_mutex);
-</br>				pthread_mutex_lock(&data->state_mutex);
-</br>				data->simulation_stop = 1;
-</br>				pthread_mutex_unlock(&data->state_mutex);
-</br>				pthread_mutex_unlock(&data->print_mutex);
-</br>				return (NULL);
-</br>			}
-</br>		}
-</br>
-</br>		// Check if any philosopher died
-</br>		while (i < data->num_philosophers)
-</br>		{
-</br>			pthread_mutex_lock(&philos[i].meal_mutex);
-</br>			current_time = get_time();
-</br>			if (!philos[i].eating && 
-</br>				(current_time - philos[i].last_meal_time) >= data->time_to_die)
-</br>			{
-</br>				pthread_mutex_unlock(&philos[i].meal_mutex);
-</br>				
-</br>				// Fix deadlock by using the same locking order as print_status
-</br>				pthread_mutex_lock(&data->print_mutex);
-</br>				pthread_mutex_lock(&data->state_mutex);
-</br>				
-</br>				data->simulation_stop = 1;
-</br>				printf("%lld %d died\n", get_time() - data->start_time, philos[i].id);
-</br>				
-</br>				pthread_mutex_unlock(&data->state_mutex);
-</br>				pthread_mutex_unlock(&data->print_mutex);
-</br>				return (NULL);
-</br>			}
-</br>			pthread_mutex_unlock(&philos[i].meal_mutex);
-</br>			i++;
-</br>		}
-</br>		
-</br>		usleep(1000); // Reduce CPU usage
-</br>	}
-</br>	return (NULL);
-</br>}
-            </div>
-            <p>
-                The <code>monitor_routine()</code> function is a separate thread that constantly checks:
-            </p>
-            <ol style="margin-left: 30px; margin-bottom: 20px;">
-                <li>If all philosophers have eaten the required number of meals (if specified)</li>
-                <li>If any philosopher has gone too long without eating and died</li>
-            </ol>
-            <p>
-                It uses mutexes to safely access the shared data and updates the simulation_stop flag when either condition is met. 
-                The small <code>usleep(1000)</code> at the end helps reduce CPU usage by avoiding constant checking.
-            </p>
-            
-            <h3>Thread Creation and Synchronization</h3>
-            <div class="code-block">
-</br>int	create_threads(t_data *data)
-</br>{
-</br>	int			i;
-</br>	pthread_t	monitor;
-</br>
-</br>	data->start_time = get_time();
-</br>	
-</br>	// Initialize last_meal_time for all philosophers to start_time
-</br>	i = 0;
-</br>	while (i < data->num_philosophers)
-</br>	{
-</br>		pthread_mutex_lock(&data->philosophers[i].meal_mutex);
-</br>		data->philosophers[i].last_meal_time = data->start_time;
-</br>		pthread_mutex_unlock(&data->philosophers[i].meal_mutex);
-</br>		i++;
-</br>	}
-</br>	
-</br>	i = 0;
-</br>	while (i < data->num_philosophers)
-</br>	{
-</br>		if (pthread_create(&data->philosophers[i].thread, NULL, 
-</br>							philosopher_routine, &data->philosophers[i]) != 0)
-</br>			return (FAILURE);
-</br>		i++;
-</br>	}
-</br>
-</br>	if (pthread_create(&monitor, NULL, monitor_routine, data) != 0)
-</br>		return (FAILURE);
-</br>
-</br>	// All threads are ready to start
-</br>	data->all_threads_ready = 1;
-</br>
-</br>	// Wait for all philosopher threads to finish
-</br>	i = 0;
-</br>	while (i < data->num_philosophers)
-</br>	{
-</br>		if (pthread_join(data->philosophers[i].thread, NULL) != 0)
-</br>			return (FAILURE);
-</br>		i++;
-</br>	}
-</br>
-</br>	// Wait for monitor thread
-</br>	if (pthread_join(monitor, NULL) != 0)
-</br>		return (FAILURE);
-</br>
-</br>	return (SUCCESS);
-</br>}
-            </div>
-            <p>
-                The <code>create_threads()</code> function manages the creation and synchronization of all threads:
-            </p>
-            <ol style="margin-left: 30px; margin-bottom: 20px;">
-                <li>It records the simulation start time</li>
-                <li>It initializes each philosopher's last_meal_time to the start time</li>
-                <li>It creates a thread for each philosopher</li>
-                <li>It creates a monitor thread to check for deaths and meal completion</li>
-                <li>It sets the all_threads_ready flag to synchronize the start of all threads</li>
-                <li>It waits for all threads to complete using pthread_join</li>
-            </ol>
-            
-            <h3>Philosopher Lifecycle</h3>
-            <div class="code-block">
-</br>void	*philosopher_routine(void *arg)
-</br>{
-</br>	t_philo	*philo;
-</br>
-</br>	philo = (t_philo *)arg;
-</br>
-</br>	// Wait until all threads are ready
-</br>	while (!philo->data->all_threads_ready)
-</br>		usleep(100);
-</br>
-</br>	// Stagger philosophers to prevent all of them from taking forks at the same time
-</br>	if (philo->id % 2 == 0)
-</br>		usleep(1000);
-</br>
-</br>	// Set initial last meal time
-</br>	pthread_mutex_lock(&philo->meal_mutex);
-</br>	philo->last_meal_time = get_time();
-</br>	pthread_mutex_unlock(&philo->meal_mutex);
-</br>
-</br>	// Main philosopher cycle
-</br>	while (1)
-</br>	{
-</br>		pthread_mutex_lock(&philo->data->state_mutex);
-</br>		if (philo->data->simulation_stop)
-</br>		{
-</br>			pthread_mutex_unlock(&philo->data->state_mutex);
-</br>			break;
-</br>		}
-</br>		pthread_mutex_unlock(&philo->data->state_mutex);
-</br>
-</br>		if (philo_eat(philo) == FAILURE)
-</br>			break;
-</br>		if (philo_sleep(philo) == FAILURE)
-</br>			break;
-</br>		if (philo_think(philo) == FAILURE)
-</br>			break;
-</br>	}
-</br>
-</br>	return (NULL);
-</br>}
-            </div>
-            <p>
-                The <code>philosopher_routine()</code> function defines the behavior of each philosopher thread:
-            </p>
-            <ol style="margin-left: 30px; margin-bottom: 20px;">
-                <li>It waits for the all_threads_ready flag before starting</li>
-                <li>It staggers even-numbered philosophers to reduce contention for forks</li>
-                <li>It continuously cycles through eating, sleeping, and thinking until the simulation ends</li>
-                <li>It checks the simulation_stop flag on each iteration to know when to exit</li>
-            </ol>
-            
-            <h3>Safe Status Printing</h3>
-            <div class="code-block">
-</br>void	print_status(t_philo *philo, char *status)
-</br>{
-</br>	long long	current_time;
-</br>
-</br>	pthread_mutex_lock(&philo->data->print_mutex);
-</br>	pthread_mutex_lock(&philo->data->state_mutex);
-</br>	if (!philo->data->simulation_stop)
-</br>	{
-</br>		current_time = get_time() - philo->data->start_time;
-</br>		printf("%lld %d %s\n", current_time, philo->id, status);
-</br>	}
-</br>	pthread_mutex_unlock(&philo->data->state_mutex);
-</br>	pthread_mutex_unlock(&philo->data->print_mutex);
-</br>}
-            </div>
-            <p>
-                The <code>print_status()</code> function safely prints the philosopher's status:
-            </p>
-            <ol style="margin-left: 30px; margin-bottom: 20px;">
-                <li>It acquires both the print_mutex and state_mutex to ensure atomic printing</li>
-                <li>It only prints if the simulation hasn't stopped</li>
-                <li>It calculates and includes the elapsed time since the simulation started</li>
-                <li>It properly releases the mutexes in the reverse order of acquisition</li>
-            </ol>
-            
-            <h3>Edge Case: Single Philosopher</h3>
-            <p>
-                Notice how the code handles the edge case of a single philosopher:
-            </p>
-            <div class="code-block">
-</br>// From philo_eat()
-</br>// If there's only one philosopher
-</br>if (philo->data->num_philosophers == 1)
-</br>{
-</br>    pthread_mutex_unlock(&first_fork->mutex);
-</br>    precise_sleep(philo->data->time_to_die);
-</br>    return (FAILURE);
-</br>}
-            </div>
-            <p>
-                With only one philosopher and one fork, it's impossible for the philosopher to eat (since eating requires two forks). The implementation recognizes this special case and handles it by having the philosopher hold the single fork until they die of starvation after time_to_die milliseconds.
-            </p>
-        </section>
-        
-        <section id="visualization">
-            <h2>Visualization of the Simulation</h2>
-            <p>
-                During the simulation, philosophers transition between three states:
-            </p>
-            <div style="display: flex; justify-content: center; gap: 20px; margin: 20px 0;">
-                <div style="padding: 15px; background-color: #f9f9f9; border-radius: 5px; text-align: center; width: 30%;">
-                    <h3 style="margin-top: 0;">Eating <span class="status eating">EATING</span></h3>
-                    <p>Philosopher is consuming food with both forks</p>
-                </div>
-                <div style="padding: 15px; background-color: #f9f9f9; border-radius: 5px; text-align: center; width: 30%;">
-                    <h3 style="margin-top: 0;">Sleeping <span class="status sleeping">SLEEPING</span></h3>
-                    <p>Philosopher is resting after a meal</p>
-                </div>
-                <div style="padding: 15px; background-color: #f9f9f9; border-radius: 5px; text-align: center; width: 30%;">
-                    <h3 style="margin-top: 0;">Thinking <span class="status thinking">THINKING</span></h3>
-                    <p>Philosopher is waiting to eat again</p>
-                </div>
-            </div>
-            
-            <p>
-                The fourth state, <span class="status dead">DEAD</span>, occurs if a philosopher doesn't eat within the time_to_die period.
-            </p>
-            
-            <h3>Example Output</h3>
-            <div class="code-block">
-                    </br> 0 1 has taken a fork
-                    </br> 0 1 has taken a fork
-                    </br> 0 1 is eating
-                    </br> 0 3 has taken a fork
-                    </br> 0 3 has taken a fork
-                    </br> 0 3 is eating
-                    </br> 0 5 has taken a fork
-                    </br> 0 5 has taken a fork
-                    </br> 0 5 is eating
-                    </br> 200 1 is sleeping
-                    </br> 200 2 has taken a fork
-                    </br> 200 2 has taken a fork
-                    </br> 200 2 is eating
-                    </br> 200 3 is sleeping
-                    </br> 200 4 has taken a fork
-                    </br> 200 4 has taken a fork
-                    </br> 200 4 is eating
-                    </br> 200 5 is sleeping
-                    </br> 400 1 is thinking
-                    </br> 400 2 is sleeping
-                    </br> 400 3 is thinking
-                    </br> 400 4 is sleeping
-                    </br> 400 5 is thinking
-                    </br> 400 1 has taken a fork
-                    </br> 400 1 has taken a fork
-                    </br> 400 1 is eating
-                    </br> 400 3 has taken a fork
-                    </br> 400 3 has taken a fork
-                    </br> 400 3 is eating
-                    </br> 400 5 has taken a fork
-                    </br> 400 5 has taken a fork
-                    </br> 400 5 is eating
-            </div>
-            <p>
-                Each line shows a timestamp (in milliseconds), philosopher ID, and the action/state.
-            </p>
-        </section>
-        
-        <section id="running">
-            <h2>Running the Program</h2>
-            <p>
-                To run the simulation, compile the program with:
-            </p>
-            <div class="code-block">
-                make -C philo
-            </div>
-            <p>
-                Then run the program with the following arguments:
-            </p>
-            <div class="code-block">
-                ./philo/philo [number_of_philosophers] [time_to_die] [time_to_eat] [time_to_sleep] [optional: number_of_times_each_philosopher_must_eat]
-            </div>
-            <p>
-                For example:
-            </p>
-            <div class="code-block">
-                ./philo/philo 5 800 200 200
-            </div>
-            <p>
-                This runs a simulation with 5 philosophers, 800ms time to die, 200ms time to eat, and 200ms time to sleep.
-            </p>
-            <p>
-                To run with a required number of meals:
-            </p>
-            <div class="code-block">
-                ./philo/philo 5 800 200 200 7
-            </div>
-            <p>
-                This will end the simulation once each philosopher has eaten 7 times.
-            </p>
-        </section>
-        
-        <section id="conclusion">
-            <h2>Conclusion</h2>
-            <p>
-                The dining philosophers problem elegantly illustrates fundamental challenges in concurrent programming:
-            </p>
-            <ul style="margin-left: 30px; margin-bottom: 20px;">
-                <li>Resource allocation and management</li>
-                <li>Deadlock prevention</li>
-                <li>Race condition avoidance</li>
-                <li>Balancing efficiency with safety</li>
-            </ul>
-            <p>
-                Our implementation provides a robust solution using POSIX threads and mutexes. By carefully designing the way philosophers acquire and release forks, and by using appropriate synchronization primitives, we've created a solution that avoids deadlock while allowing maximum concurrency.
-            </p>
-            <p>
-                This project demonstrates practical application of multithreading concepts and serves as an excellent example of how to properly manage shared resources in a concurrent environment.
-            </p>
-        </section>
+        </nav>
     </div>
-    
-    <footer>
-        <p>Dining Philosophers Implementation — Created by mkurkar — © 2025</p>
+
+    <!-- Mobile Navigation -->
+    <ul class="sidenav" id="mobile-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="overview.html">Overview</a></li>
+        <li><a href="code-explained.html">Code Explained</a></li>
+        <li><a href="visualization.html">Visualization</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li><a href="game.html">Game</a></li>
+        <li><a href="learning-paths.html">Learning Paths</a></li>
+    </ul>
+
+    <!-- Hero Section -->
+    <div class="parallax-container" style="height: 400px;">
+        <div class="parallax">
+            <img src="img/philosophers_bg.jpg" alt="Philosophers" style="opacity: 0.7;">
+        </div>
+        <div class="container center-align" style="padding-top: 100px;">
+            <h1 class="white-text">The Dining Philosophers Problem</h1>
+            <h5 class="white-text">A classic synchronization and concurrency challenge</h5>
+            <a href="#intro" class="btn-large deep-purple waves-effect waves-light pulse">Learn More</a>
+        </div>
+    </div>
+
+    <!-- Intro Section -->
+    <section id="intro" class="container section scrollspy">
+        <div class="row">
+            <div class="col s12 center-align">
+                <h3 class="deep-purple-text">The Dining Philosophers</h3>
+                <div class="divider"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m8 offset-m2">
+                <p class="flow-text">
+                    The Dining Philosophers problem is a classic example in computer science used to illustrate synchronization issues and techniques for resolving them. It was originally formulated in 1965 by Edsger Dijkstra as a student exam exercise, and later put in its current form by Tony Hoare.
+                </p>
+                <p class="flow-text">
+                    This project implements a solution to the Dining Philosophers problem using threads and mutexes in C, demonstrating an understanding of concurrent programming concepts.
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 center-align">
+                <a href="overview.html" class="btn deep-purple waves-effect waves-light">Explore the Problem</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="grey lighten-4">
+        <div class="container section">
+            <div class="row">
+                <div class="col s12 center-align">
+                    <h3 class="deep-purple-text">Key Features</h3>
+                    <div class="divider"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 m4">
+                    <div class="card-panel center-align">
+                        <i class="material-icons large deep-purple-text">people</i>
+                        <h5>Multi-threaded Simulation</h5>
+                        <p>Each philosopher is represented as an independent thread, simulating real-world concurrent processes.</p>
+                    </div>
+                </div>
+                <div class="col s12 m4">
+                    <div class="card-panel center-align">
+                        <i class="material-icons large deep-purple-text">lock</i>
+                        <h5>Mutex Management</h5>
+                        <p>Demonstrates proper use of mutex locks to prevent race conditions and ensure synchronized access to shared resources.</p>
+                    </div>
+                </div>
+                <div class="col s12 m4">
+                    <div class="card-panel center-align">
+                        <i class="material-icons large deep-purple-text">settings_backup_restore</i>
+                        <h5>Deadlock Prevention</h5>
+                        <p>Implements strategies to prevent deadlocks where philosophers would wait indefinitely for resources.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="page-footer deep-purple">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m6">
+                    <h5 class="white-text">About This Project</h5>
+                    <p class="grey-text text-lighten-4">
+                        This project was developed as part of the 42 curriculum, demonstrating understanding of threads,
+                        mutexes, and concurrent programming principles.
+                    </p>
+                </div>
+                <div class="col s12 m4 offset-m2">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="https://en.wikipedia.org/wiki/Dining_philosophers_problem" target="_blank">Wikipedia: Dining Philosophers Problem</a></li>
+                        <li><a class="grey-text text-lighten-3" href="https://www.42.fr/" target="_blank">42 School</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 Philosophers Project Documentation
+            </div>
+        </div>
     </footer>
-    
-    <script>
-        // Simple animation for the philosopher states
-        document.addEventListener('DOMContentLoaded', function() {
-            // This could be expanded into a more interactive simulation
-            console.log("Document loaded - ready for interactive elements");
-        });
-    </script>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

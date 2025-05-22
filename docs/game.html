@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophers - Interactive Game</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Prism.js for code highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        #game-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        #game-ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            color: white;
+            font-weight: bold;
+            background-color: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        #philosopher-stats {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-around;
+            background-color: rgba(0,0,0,0.5);
+            padding: 10px;
+        }
+        
+        .philo-stat {
+            color: white;
+            text-align: center;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        .game-controls {
+            margin-bottom: 20px;
+        }
+        
+        .modal-content h4 {
+            color: #7e57c2;
+        }
+        
+        .hint-text {
+            font-style: italic;
+            color: #7e57c2;
+            margin-top: 10px;
+        }
+        
+        .instructions-list li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar-fixed">
+        <nav class="deep-purple">
+            <div class="nav-wrapper container">
+                <a href="#!" class="brand-logo">Philosophers</a>
+                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="overview.html">Overview</a></li>
+                    <li><a href="code-explained.html">Code Explained</a></li>
+                    <li><a href="visualization.html">Visualization</a></li>
+                    <li><a href="documentation.html">Documentation</a></li>
+                    <li class="active"><a href="game.html">Game</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <ul class="sidenav" id="mobile-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="overview.html">Overview</a></li>
+        <li><a href="code-explained.html">Code Explained</a></li>
+        <li><a href="visualization.html">Visualization</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li class="active"><a href="game.html">Game</a></li>
+    </ul>
+    
+    <div class="container section">
+        <div class="row">
+            <div class="col s12">
+                <h2 class="deep-purple-text">Dining Philosophers Game</h2>
+                <div class="divider"></div>
+                <p class="flow-text">Experience the Dining Philosophers problem firsthand in this interactive 3D game! Control the philosophers and try to avoid deadlocks while ensuring everyone gets to eat.</p>
+            </div>
+        </div>
+        
+        <!-- Game Instructions Modal -->
+        <div id="instructions-modal" class="modal">
+            <div class="modal-content">
+                <h4>How to Play</h4>
+                <ul class="instructions-list">
+                    <li>You are controlling 5 philosophers sitting around a table.</li>
+                    <li>Your goal is to ensure all philosophers eat without any of them starving.</li>
+                    <li>Click on a philosopher to select them (they'll glow).</li>
+                    <li>Use the action buttons to make them:
+                        <ul>
+                            <li><strong>Think</strong>: Do nothing (default state)</li>
+                            <li><strong>Pick Up Forks</strong>: Try to grab both forks (can only eat if both are available)</li>
+                            <li><strong>Eat</strong>: Consume food (only works if holding both forks)</li>
+                            <li><strong>Put Down Forks</strong>: Release forks after eating</li>
+                        </ul>
+                    </li>
+                    <li>Each philosopher has a hunger meter that increases over time.</li>
+                    <li>If anyone's hunger reaches 100%, they starve and you lose.</li>
+                    <li>Watch out for deadlocks! If all philosophers hold one fork and wait for another, you'll need to make someone release theirs.</li>
+                    <li>Score points by successfully feeding all philosophers multiple times.</li>
+                </ul>
+                <p class="hint-text">Hint: Remember the deadlock prevention strategy - try not letting all philosophers pick up forks at the same time!</p>
+            </div>
+            <div class="modal-footer">
+                <a href="#!" class="modal-close waves-effect waves-green btn-flat">Got it!</a>
+            </div>
+        </div>
+        
+        <!-- Game Controls -->
+        <div class="row game-controls">
+            <div class="col s12 m8">
+                <button id="start-game" class="btn waves-effect waves-light deep-purple">
+                    Start Game
+                    <i class="material-icons right">play_arrow</i>
+                </button>
+                <button id="reset-game" class="btn waves-effect waves-light red lighten-1">
+                    Reset Game
+                    <i class="material-icons right">refresh</i>
+                </button>
+                <button id="show-instructions" class="btn waves-effect waves-light teal lighten-1">
+                    Instructions
+                    <i class="material-icons right">help</i>
+                </button>
+            </div>
+            <div class="col s12 m4 right-align">
+                <div class="chip deep-purple white-text">
+                    <span id="score-display">Score: 0</span>
+                </div>
+                <div class="chip orange darken-2 white-text">
+                    <span id="time-display">Time: 0s</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game Container -->
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <div id="game-container">
+                            <canvas id="game-canvas"></canvas>
+                            <div id="game-ui">
+                                <div>Selected: <span id="selected-philosopher">None</span></div>
+                            </div>
+                            <div id="philosopher-stats">
+                                <!-- Philosopher stats will be added by JS -->
+                            </div>
+                        </div>
+                        
+                        <!-- Philosopher Action Buttons -->
+                        <div class="center-align" style="margin-top: 20px;">
+                            <button id="action-think" class="btn waves-effect waves-light blue" disabled>
+                                Think
+                                <i class="material-icons right">psychology</i>
+                            </button>
+                            <button id="action-take-forks" class="btn waves-effect waves-light amber darken-2" disabled>
+                                Pick Up Forks
+                                <i class="material-icons right">restaurant</i>
+                            </button>
+                            <button id="action-eat" class="btn waves-effect waves-light green" disabled>
+                                Eat
+                                <i class="material-icons right">restaurant_menu</i>
+                            </button>
+                            <button id="action-release-forks" class="btn waves-effect waves-light red" disabled>
+                                Put Down Forks
+                                <i class="material-icons right">pan_tool</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game Explanation -->
+        <div class="row">
+            <div class="col s12">
+                <div class="card-panel">
+                    <h4>Learning Through Play</h4>
+                    <p class="flow-text">This game illustrates the core challenges of the Dining Philosophers problem:</p>
+                    
+                    <ul class="collapsible">
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">report_problem</i>Deadlock</div>
+                            <div class="collapsible-body">
+                                <p>A deadlock occurs when all philosophers pick up one fork and wait indefinitely for the second fork, which will never become available. In the game, you'll need to strategically manage which philosophers try to pick up forks to avoid this situation.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">priority_high</i>Resource Contention</div>
+                            <div class="collapsible-body">
+                                <p>With only 5 forks shared among 5 philosophers, there's contention for resources. This demonstrates how concurrent processes compete for limited shared resources in computer systems.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">hourglass_empty</i>Starvation</div>
+                            <div class="collapsible-body">
+                                <p>If you prioritize certain philosophers over others, some may starve while waiting for their turn. This models process starvation in operating systems where some processes never get enough CPU time.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">lightbulb</i>Solutions</div>
+                            <div class="collapsible-body">
+                                <p>As you play, try to discover different strategies to avoid deadlock and starvation:
+                                    <ul class="browser-default">
+                                        <li>Resource hierarchy (philosophers pick up lower-numbered fork first)</li>
+                                        <li>Even/odd strategy (even-numbered philosophers pick up right fork first, odd pick up left)</li>
+                                        <li>Arbitrator approach (central control of who can pick up forks)</li>
+                                        <li>Limited philosophers (only allow 4 philosophers to eat at once)</li>
+                                    </ul>
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code to Game Connection -->
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title deep-purple-text">Code to Game Connection</span>
+                        <p>See how game elements directly relate to actual code implementation:</p>
+                        
+                        <div class="concept-connection">
+                            <div class="code-side">
+                                <h5>In the Code:</h5>
+                                <pre><code class="language-c">static void setup_forks(t_philo *philo, t_fork **first, t_fork **second)
+{
+    if (philo->id % 2 == 0)
+    {
+        *first = philo->right_fork;
+        *second = philo->left_fork;
+    }
+    else
+    {
+        *first = philo->left_fork;
+        *second = philo->right_fork;
+    }
+}</code></pre>
+                            </div>
+                            <div class="connection-arrow">
+                                <i class="material-icons large">compare_arrows</i>
+                            </div>
+                            <div class="game-side">
+                                <h5>In the Game:</h5>
+                                <p>When you click "Pick Up Forks", the philosophers attempt to grab forks in a specific order. Even-numbered philosophers try for the right fork first, while odd-numbered try for the left fork first.</p>
+                                <p class="deep-purple-text">Try it: Select philosophers 2 and 3, then try to make them eat at the same time!</p>
+                            </div>
+                        </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <div class="concept-connection">
+                            <div class="code-side">
+                                <h5>In the Code:</h5>
+                                <pre><code class="language-c">int philo_eat(t_philo *philo)
+{
+    pthread_mutex_lock(&(philo->meal_mutex));
+    philo->eating = 1;
+    philo->last_meal_time = get_time();
+    philo->meals_eaten++;
+    pthread_mutex_unlock(&(philo->meal_mutex));</code></pre>
+                            </div>
+                            <div class="connection-arrow">
+                                <i class="material-icons large">compare_arrows</i>
+                            </div>
+                            <div class="game-side">
+                                <h5>In the Game:</h5>
+                                <p>After a philosopher has both forks, clicking "Eat" reduces their hunger and increases their meal count. Notice how they can't eat without both forks - just like the code requires locking both mutexes.</p>
+                                <p class="deep-purple-text">Try it: Get both forks for a philosopher and observe what happens when they eat!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="page-footer deep-purple">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m6">
+                    <h5 class="white-text">About This Project</h5>
+                    <p class="grey-text text-lighten-4">
+                        This project was developed as part of the 42 curriculum, demonstrating understanding of threads,
+                        mutexes, and concurrent programming principles.
+                    </p>
+                </div>
+                <div class="col s12 m4 offset-m2">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="https://en.wikipedia.org/wiki/Dining_philosophers_problem" target="_blank">Wikipedia: Dining Philosophers Problem</a></li>
+                        <li><a class="grey-text text-lighten-3" href="https://www.42.fr/" target="_blank">42 School</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 Philosophers Project Documentation
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="js/philosophers-game.js"></script>
+    <script src="js/code-highlight.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Materialize components
+            M.AutoInit();
+            
+            // Show instructions modal on first load
+            const instructionsModal = M.Modal.getInstance(document.getElementById('instructions-modal'));
+            instructionsModal.open();
+            
+            // Button event listener for instructions
+            document.getElementById('show-instructions').addEventListener('click', function() {
+                instructionsModal.open();
+            });
+            
+            // Set up concept connection links
+            const conceptLinks = document.querySelectorAll('.deep-purple-text');
+            conceptLinks.forEach(link => {
+                link.classList.add('highlight-trigger');
+                link.style.cursor = 'pointer';
+            });
+        });
+    </script>
+</body>
+</html>

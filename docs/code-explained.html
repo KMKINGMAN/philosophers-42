@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophers - Code Explained</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Prism.js for code highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .code-highlight-section {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .code-highlight-anchor {
+            position: absolute;
+            top: -80px;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar-fixed">
+        <nav class="deep-purple">
+            <div class="nav-wrapper container">
+                <a href="#!" class="brand-logo">Philosophers</a>
+                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="overview.html">Overview</a></li>
+                    <li class="active"><a href="code-explained.html">Code Explained</a></li>
+                    <li><a href="visualization.html">Visualization</a></li>
+                    <li><a href="documentation.html">Documentation</a></li>
+                    <li><a href="game.html">Game</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <ul class="sidenav" id="mobile-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="overview.html">Overview</a></li>
+        <li class="active"><a href="code-explained.html">Code Explained</a></li>
+        <li><a href="visualization.html">Visualization</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li><a href="game.html">Game</a></li>
+    </ul>
+
+    <!-- Code Navigation -->
+    <div class="container">
+        <div class="row">
+            <div class="col s12">
+                <ul class="tabs code-snippet-tabs">
+                    <li class="tab col s2"><a href="#data-structures">Data Structures</a></li>
+                    <li class="tab col s2"><a href="#initialization">Initialization</a></li>
+                    <li class="tab col s2"><a href="#philo-routine">Philosopher Routine</a></li>
+                    <li class="tab col s2"><a href="#monitor-routine">Monitor Routine</a></li>
+                    <li class="tab col s2"><a href="#utils">Utilities</a></li>
+                    <li class="tab col s2"><a href="#main">Main Function</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container section">
+        <!-- Interactive Reference Card -->
+        <div class="card gradient-card deep-purple lighten-5">
+            <div class="card-content">
+                <span class="card-title deep-purple-text"><i class="material-icons left">games</i>Interactive Learning</span>
+                <p>Want to understand the concepts better? Try our <a href="game.html" class="deep-purple-text"><b>interactive game</b></a> where you can control philosophers and experience the problems firsthand.</p>
+                <div class="chip deep-purple white-text">Deadlock Prevention</div>
+                <div class="chip deep-purple white-text">Resource Contention</div>
+                <div class="chip deep-purple white-text">Starvation</div>
+                <div class="chip deep-purple white-text">Concurrency</div>
+            </div>
+        </div>
+
+        <!-- Data Structures Section -->
+        <div id="data-structures">
+            <h3 class="deep-purple-text">Data Structures</h3>
+            <div class="card-panel">
+                <h4>Core Structures</h4>
+                <p class="flow-text">The program uses several key data structures to manage the simulation:</p>
+                
+                <div class="code-highlight">
+                    <pre><code class="language-c">typedef struct s_fork
+{
+    pthread_mutex_t  mutex;
+    int             id;
+}   t_fork;
+
+typedef struct s_philo
+{
+    int             id;
+    int             meals_eaten;
+    int             eating;
+    long long       last_meal_time;
+    pthread_t       thread;
+    t_fork          *left_fork;
+    t_fork          *right_fork;
+    pthread_mutex_t meal_mutex;
+    t_data          *data;
+}   t_philo;
+
+typedef struct s_data
+{
+    int             num_philosophers;
+    int             time_to_die;
+    int             time_to_eat;
+    int             time_to_sleep;
+    int             must_eat_count;
+    int             all_threads_ready;
+    int             simulation_stop;
+    long long       start_time;
+    t_philo         *philosophers;
+    t_fork          *forks;
+    pthread_mutex_t print_mutex;
+    pthread_mutex_t state_mutex;
+}   t_data;</code></pre>
+                </div>
+                
+                <div class="code-explanation">
+                    <h5>Structure Breakdown:</h5>
+                    <ul class="browser-default">
+                        <li><strong>t_fork:</strong> Represents a single fork with a mutex for exclusive access.</li>
+                        <li><strong>t_philo:</strong> Represents a philosopher with their state information:
+                            <ul>
+                                <li><em>id:</em> Philosopher's unique identifier</li>
+                                <li><em>meals_eaten:</em> Count of completed meals</li>
+                                <li><em>eating:</em> Flag indicating if the philosopher is currently eating</li>
+                                <li><em>last_meal_time:</em> Timestamp of last meal start</li>
+                                <li><em>thread:</em> The philosopher's thread identifier</li>
+                                <li><em>left_fork/right_fork:</em> Pointers to the forks on each side</li>
+                                <li><em>meal_mutex:</em> Mutex for protecting meal-related data</li>
+                                <li><em>data:</em> Pointer to shared simulation data</li>
+                            </ul>
+                        </li>
+                        <li><strong>t_data:</strong> Contains global simulation data:
+                            <ul>
+                                <li><em>num_philosophers:</em> Total number of philosophers</li>
+                                <li><em>time_to_die/eat/sleep:</em> Time parameters for simulation</li>
+                                <li><em>must_eat_count:</em> Optional parameter for meal requirement</li>
+                                <li><em>all_threads_ready:</em> Flag for thread synchronization</li>
+                                <li><em>simulation_stop:</em> Flag to signal simulation end</li>
+                                <li><em>start_time:</em> Timestamp when simulation began</li>
+                                <li><em>philosophers/forks:</em> Arrays of philosopher and fork structures</li>
+                                <li><em>print_mutex:</em> Controls console output to prevent garbled text</li>
+                                <li><em>state_mutex:</em> Protects shared state variables</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Initialization Section -->
+        <div id="initialization">
+            <h3 class="deep-purple-text">Initialization</h3>
+            <div class="card-panel">
+                <h4>Setting Up the Simulation</h4>
+                <p class="flow-text">Before the simulation can begin, several initialization steps must occur:</p>
+                
+                <div class="function-block">
+                    <h5>Initializing Data from Command Arguments</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">int init_data(t_data *data, int argc, char **argv)
+{
+    // Parse and validate command line arguments
+    data->num_philosophers = ft_atoi(argv[1]);
+    data->time_to_die = ft_atoi(argv[2]);
+    data->time_to_eat = ft_atoi(argv[3]);
+    data->time_to_sleep = ft_atoi(argv[4]);
+    
+    // Handle optional argument
+    if (argc == 6)
+        data->must_eat_count = ft_atoi(argv[5]);
+    else
+        data->must_eat_count = -1;
+        
+    // Initialize state variables
+    data->all_threads_ready = 0;
+    data->simulation_stop = 0;
+    
+    // Validate inputs and allocate memory for philosophers and forks
+    // ...
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This function parses command-line arguments and sets up the core data structure. It validates that all values are positive and initializes the state variables.</p>
+                    </div>
+                </div>
+                
+                <div class="function-block">
+                    <h5>Initializing Forks</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">int init_forks(t_data *data)
+{
+    int i;
+    
+    i = 0;
+    while (i < data->num_philosophers)
+    {
+        data->forks[i].id = i + 1;
+        if (pthread_mutex_init(&data->forks[i].mutex, NULL) != 0)
+            return (FAILURE);
+        i++;
+    }
+    return (SUCCESS);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This function initializes the mutex for each fork. Each mutex ensures that only one philosopher can access a fork at a time, preventing race conditions.</p>
+                    </div>
+                </div>
+                
+                <div class="function-block">
+                    <h5>Initializing Philosophers</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">int init_philosophers(t_data *data)
+{
+    int i;
+    
+    i = 0;
+    while (i < data->num_philosophers)
+    {
+        data->philosophers[i].id = i + 1;
+        data->philosophers[i].meals_eaten = 0;
+        data->philosophers[i].eating = 0;
+        data->philosophers[i].data = data;
+        
+        // Assign left and right forks
+        data->philosophers[i].left_fork = &data->forks[i];
+        data->philosophers[i].right_fork = &data->forks[(i + 1) % data->num_philosophers];
+        
+        // Initialize meal mutex
+        if (pthread_mutex_init(&data->philosophers[i].meal_mutex, NULL) != 0)
+            return (FAILURE);
+        i++;
+    }
+    return (SUCCESS);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This function sets up each philosopher with their initial state and assigns them their left and right forks. The modulo operation for the right fork ensures that the last philosopher's right fork is the first philosopher's left fork, creating the circular arrangement.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Philosopher Routine Section -->
+        <div id="philo-routine">
+            <h3 class="deep-purple-text">Philosopher Routine</h3>
+            <div class="card-panel">
+                <h4>The Life of a Philosopher</h4>
+                <p class="flow-text">Each philosopher executes its own thread with this routine:</p>
+                
+                <div class="function-block">
+                    <h5>Main Philosopher Routine</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">void *philosopher_routine(void *arg)
+{
+    t_philo *philo;
+
+    philo = (t_philo *)arg;
+    wait_for_all_threads(philo);
+    
+    // Stagger even-numbered philosophers to prevent deadlock
+    if (philo->id % 2 == 0)
+        usleep(1000);
+        
+    // Set initial meal time
+    pthread_mutex_lock(&philo->meal_mutex);
+    philo->last_meal_time = get_time();
+    pthread_mutex_unlock(&philo->meal_mutex);
+
+    // Main lifecycle loop
+    while (1)
+    {
+        // Check if simulation is over
+        pthread_mutex_lock(&philo->data->state_mutex);
+        if (philo->data->simulation_stop)
+        {
+            pthread_mutex_unlock(&philo->data->state_mutex);
+            break;
+        }
+        pthread_mutex_unlock(&philo->data->state_mutex);
+        
+        // Try to eat, sleep, think
+        if (!philo_eat(philo))
+            break;
+        if (!philo_sleep(philo))
+            break;
+        if (!philo_think(philo))
+            break;
+    }
+    return (NULL);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This is the main function for each philosopher thread. It follows a cycle of eating, sleeping, and thinking. Key features include:</p>
+                        <ul class="browser-default">
+                            <li>Wait for all threads to be ready before starting</li>
+                            <li>Staggering even-numbered philosophers to prevent initial deadlock</li>
+                            <li>Regular checks if the simulation should stop</li>
+                            <li>Cycle through eating, sleeping, and thinking until simulation ends</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="function-block">
+                    <h5>Eating Action</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">int philo_eat(t_philo *philo)
+{
+    t_fork *first;
+    t_fork *second;
+    
+    // Determine fork order based on philosopher ID
+    setup_forks(philo, &first, &second);
+    
+    // Try to acquire first fork
+    pthread_mutex_lock(&first->mutex);
+    print_status(philo, "has taken a fork");
+    
+    // Handle case with only one philosopher
+    if (philo->data->num_philosophers == 1)
+    {
+        precise_sleep(philo->data->time_to_die);
+        pthread_mutex_unlock(&first->mutex);
+        return (0);
+    }
+    
+    // Try to acquire second fork
+    pthread_mutex_lock(&second->mutex);
+    print_status(philo, "has taken a fork");
+    
+    // Mark as eating and update meal time
+    pthread_mutex_lock(&philo->meal_mutex);
+    philo->eating = 1;
+    philo->last_meal_time = get_time();
+    pthread_mutex_unlock(&philo->meal_mutex);
+    
+    // Print status and sleep while eating
+    print_status(philo, "is eating");
+    precise_sleep(philo->data->time_to_eat);
+    
+    // Update meals eaten count and eating status
+    pthread_mutex_lock(&philo->meal_mutex);
+    philo->meals_eaten++;
+    philo->eating = 0;
+    pthread_mutex_unlock(&philo->meal_mutex);
+    
+    // Release forks
+    pthread_mutex_unlock(&second->mutex);
+    pthread_mutex_unlock(&first->mutex);
+    
+    return (1);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This function handles the eating action for a philosopher:</p>
+                        <ul class="browser-default">
+                            <li>First determines the order in which to pick up forks (based on philosopher ID to prevent deadlock)</li>
+                            <li>Special handling for the case of only one philosopher</li>
+                            <li>Updates the philosopher's status and meal time</li>
+                            <li>Sleeps for the specified eating duration</li>
+                            <li>Updates the meal count and releases the forks in reverse order</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="function-block">
+                    <h5>Sleeping and Thinking Actions</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">int philo_sleep(t_philo *philo)
+{
+    // Check if simulation should stop
+    pthread_mutex_lock(&philo->data->state_mutex);
+    if (philo->data->simulation_stop)
+    {
+        pthread_mutex_unlock(&philo->data->state_mutex);
+        return (0);
+    }
+    pthread_mutex_unlock(&philo->data->state_mutex);
+    
+    print_status(philo, "is sleeping");
+    precise_sleep(philo->data->time_to_sleep);
+    return (1);
+}
+
+int philo_think(t_philo *philo)
+{
+    // Check if simulation should stop
+    pthread_mutex_lock(&philo->data->state_mutex);
+    if (philo->data->simulation_stop)
+    {
+        pthread_mutex_unlock(&philo->data->state_mutex);
+        return (0);
+    }
+    pthread_mutex_unlock(&philo->data->state_mutex);
+    
+    print_status(philo, "is thinking");
+    return (1);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>These functions handle the sleeping and thinking states:</p>
+                        <ul class="browser-default">
+                            <li>Both check if the simulation should stop before proceeding</li>
+                            <li>The sleep function uses precise_sleep to wait for the specified duration</li>
+                            <li>The think function simply prints the status and returns (thinking has no specified duration)</li>
+                            <li>Both use print_status to display the philosopher's current action</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Monitor Routine Section -->
+        <div id="monitor-routine">
+            <h3 class="deep-purple-text">Monitor Routine</h3>
+            <div class="card-panel">
+                <h4>Death and Completion Monitoring</h4>
+                <p class="flow-text">A dedicated monitor thread checks for philosopher death or meal completion:</p>
+                
+                <div class="function-block">
+                    <h5>Monitor Thread Main Function</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">void *monitor_routine(void *arg)
+{
+    t_data  *data;
+    t_philo *philos;
+
+    data = (t_data *)arg;
+    philos = data->philosophers;
+    wait_for_threads_ready(data);
+    
+    while (1)
+    {
+        // Check meal completion condition if specified
+        if (data->must_eat_count != -1)
+        {
+            if (check_if_all_ate(data, philos))
+            {
+                pthread_mutex_lock(&data->print_mutex);
+                pthread_mutex_lock(&data->state_mutex);
+                data->simulation_stop = 1;
+                pthread_mutex_unlock(&data->state_mutex);
+                pthread_mutex_unlock(&data->print_mutex);
+                return (NULL);
+            }
+        }
+        
+        // Check for philosopher death
+        if (check_all_philos(data, philos))
+            return (NULL);
+            
+        // Brief sleep to reduce CPU usage
+        usleep(1000);
+    }
+    return (NULL);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>The monitor thread has two primary responsibilities:</p>
+                        <ul class="browser-default">
+                            <li>If a meal count is specified, check if all philosophers have eaten enough meals</li>
+                            <li>Continuously check if any philosopher has died of starvation</li>
+                            <li>If either condition is met, signal the simulation to stop</li>
+                            <li>Uses a brief sleep to avoid excessive CPU usage</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="function-block">
+                    <h5>Checking for Philosopher Death</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">static int check_philo_death(t_data *data, t_philo *philos, int i)
+{
+    long long current_time;
+
+    pthread_mutex_lock(&philos[i].meal_mutex);
+    current_time = get_time();
+    
+    // Check if philosopher has exceeded time_to_die since last meal
+    if (!philos[i].eating && 
+        (current_time - philos[i].last_meal_time) >= data->time_to_die)
+    {
+        pthread_mutex_unlock(&philos[i].meal_mutex);
+        
+        // Stop simulation and print death message
+        pthread_mutex_lock(&data->print_mutex);
+        pthread_mutex_lock(&data->state_mutex);
+        data->simulation_stop = 1;
+        printf("%lld %d died\n", get_time() - data->start_time, philos[i].id);
+        pthread_mutex_unlock(&data->state_mutex);
+        pthread_mutex_unlock(&data->print_mutex);
+        return (1);
+    }
+    
+    pthread_mutex_unlock(&philos[i].meal_mutex);
+    return (0);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This function checks if a philosopher has died:</p>
+                        <ul class="browser-default">
+                            <li>Locks the philosopher's meal mutex to safely access their meal time</li>
+                            <li>Calculates the time since their last meal</li>
+                            <li>If the philosopher is not currently eating and time since last meal exceeds time_to_die, they have died</li>
+                            <li>When a philosopher dies, the simulation is stopped and a death message is printed</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="function-block">
+                    <h5>Checking Meal Completion</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">static int check_if_all_ate(t_data *data, t_philo *philos)
+{
+    int j;
+    int all_ate_enough;
+
+    all_ate_enough = 1;
+    j = 0;
+    
+    // Check each philosopher's meal count
+    while (j < data->num_philosophers)
+    {
+        pthread_mutex_lock(&philos[j].meal_mutex);
+        if (philos[j].meals_eaten < data->must_eat_count)
+        {
+            all_ate_enough = 0;
+            pthread_mutex_unlock(&philos[j].meal_mutex);
+            break;
+        }
+        pthread_mutex_unlock(&philos[j].meal_mutex);
+        j++;
+    }
+    
+    return (all_ate_enough);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This function checks if all philosophers have eaten enough times:</p>
+                        <ul class="browser-default">
+                            <li>Starts with the assumption that all philosophers have eaten enough</li>
+                            <li>For each philosopher, checks if their meal count meets the required amount</li>
+                            <li>If any philosopher hasn't eaten enough, returns 0</li>
+                            <li>If all philosophers have eaten enough, returns 1 to signal simulation completion</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Utils Section -->
+        <div id="utils">
+            <h3 class="deep-purple-text">Utility Functions</h3>
+            <div class="card-panel">
+                <h4>Helper Functions</h4>
+                <p class="flow-text">Several utility functions support the core simulation:</p>
+                
+                <div class="function-block">
+                    <h5>Time Management</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">long long get_time(void)
+{
+    struct timeval tv;
+
+    gettimeofday(&tv, NULL);
+    return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+}
+
+void precise_sleep(long long time_in_ms)
+{
+    long long start;
+    
+    start = get_time();
+    while ((get_time() - start) < time_in_ms)
+        usleep(100);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>These functions handle time-related operations:</p>
+                        <ul class="browser-default">
+                            <li><strong>get_time():</strong> Returns the current time in milliseconds, used for tracking meal times and the overall simulation</li>
+                            <li><strong>precise_sleep():</strong> A more accurate sleep function that uses a busy-wait approach with short sleeps to achieve precise timing</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="function-block">
+                    <h5>Status Printing</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">void print_status(t_philo *philo, char *status)
+{
+    pthread_mutex_lock(&philo->data->print_mutex);
+    pthread_mutex_lock(&philo->data->state_mutex);
+    
+    if (!philo->data->simulation_stop)
+        printf("%lld %d %s\n", get_time() - philo->data->start_time, 
+               philo->id, status);
+               
+    pthread_mutex_unlock(&philo->data->state_mutex);
+    pthread_mutex_unlock(&philo->data->print_mutex);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This function handles synchronized output to the console:</p>
+                        <ul class="browser-default">
+                            <li>Uses mutexes to ensure that output from different threads doesn't intermix</li>
+                            <li>Only prints if the simulation is still running</li>
+                            <li>Formats the output with a timestamp, philosopher ID, and status message</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="function-block">
+                    <h5>Thread Synchronization</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">static void wait_for_all_threads(t_philo *philo)
+{
+    pthread_mutex_lock(&philo->data->state_mutex);
+    
+    // Wait in this state until all_threads_ready is set
+    while (!philo->data->all_threads_ready)
+    {
+        pthread_mutex_unlock(&philo->data->state_mutex);
+        usleep(100);
+        pthread_mutex_lock(&philo->data->state_mutex);
+    }
+    
+    pthread_mutex_unlock(&philo->data->state_mutex);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This function ensures all threads start at approximately the same time:</p>
+                        <ul class="browser-default">
+                            <li>Each thread waits until the all_threads_ready flag is set</li>
+                            <li>Uses a lock-sleep-lock pattern to check the flag without holding the mutex continuously</li>
+                            <li>Once the flag is set, all threads can proceed with their routines</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Function Section -->
+        <div id="main">
+            <h3 class="deep-purple-text">Main Function</h3>
+            <div class="card-panel">
+                <h4>Program Entry Point</h4>
+                <p class="flow-text">The main function orchestrates the entire simulation:</p>
+                
+                <div class="function-block">
+                    <h5>Main Program Flow</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">int main(int argc, char **argv)
+{
+    t_data data;
+    
+    // Validate argument count
+    if (argc != 5 && argc != 6)
+    {
+        printf("Usage: %s number_of_philosophers time_to_die ", argv[0]);
+        printf("time_to_eat time_to_sleep ");
+        printf("[number_of_times_each_philosopher_must_eat]\n");
+        return (1);
+    }
+    
+    // Initialize all data structures
+    if (init_data(&data, argc, argv) == FAILURE)
+        return (1);
+        
+    // Start simulation
+    data.start_time = get_time();
+    if (create_threads(&data) == FAILURE)
+    {
+        free_data(&data);
+        return (1);
+    }
+    
+    // Wait for all threads to finish
+    join_threads(&data);
+    
+    // Free allocated resources
+    free_data(&data);
+    return (0);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>The main function follows these steps:</p>
+                        <ul class="browser-default">
+                            <li>Validates command line arguments</li>
+                            <li>Initializes all data structures and resources</li>
+                            <li>Records the simulation start time</li>
+                            <li>Creates and starts all threads</li>
+                            <li>Waits for all threads to finish (either by death or completion)</li>
+                            <li>Cleans up resources before exiting</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="function-block">
+                    <h5>Thread Creation and Management</h5>
+                    <div class="code-highlight">
+                        <pre><code class="language-c">int create_threads(t_data *data)
+{
+    int i;
+    pthread_t monitor;
+    
+    // Record simulation start time
+    data->start_time = get_time();
+    
+    // Initialize philosopher meal times
+    if (init_meal_times(data) == FAILURE)
+        return (FAILURE);
+    
+    // Create philosopher threads and monitor thread
+    if (init_philo_threads(data, &monitor) == FAILURE)
+        return (FAILURE);
+    
+    // Set all_threads_ready flag to start simulation
+    usleep(1000);
+    pthread_mutex_lock(&data->state_mutex);
+    data->all_threads_ready = 1;
+    pthread_mutex_unlock(&data->state_mutex);
+    
+    // Wait for threads to complete
+    if (pthread_join(monitor, NULL) != 0)
+        return (FAILURE);
+        
+    return (SUCCESS);
+}</code></pre>
+                    </div>
+                    <div class="code-explanation">
+                        <p>This function manages the thread creation and synchronization process:</p>
+                        <ul class="browser-default">
+                            <li>Initializes meal times for all philosophers</li>
+                            <li>Creates threads for all philosophers and the monitor</li>
+                            <li>Uses a brief delay before signaling all threads to start</li>
+                            <li>Sets the all_threads_ready flag to allow all threads to begin execution</li>
+                            <li>Waits for the monitor thread to complete (which happens when simulation ends)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container section center-align">
+        <a href="visualization.html" class="btn-large deep-purple waves-effect waves-light">View Interactive Visualization</a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="page-footer deep-purple">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m6">
+                    <h5 class="white-text">About This Project</h5>
+                    <p class="grey-text text-lighten-4">
+                        This project was developed as part of the 42 curriculum, demonstrating understanding of threads,
+                        mutexes, and concurrent programming principles.
+                    </p>
+                </div>
+                <div class="col s12 m4 offset-m2">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="https://en.wikipedia.org/wiki/Dining_philosophers_problem" target="_blank">Wikipedia: Dining Philosophers Problem</a></li>
+                        <li><a class="grey-text text-lighten-3" href="https://www.42.fr/" target="_blank">42 School</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 Philosophers Project Documentation
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/code-highlight.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add anchors for highlighting to important code sections
+            const codeBlocks = document.querySelectorAll('pre code');
+            codeBlocks.forEach((block, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'code-highlight-section';
+                wrapper.id = `code-section-${index}`;
+                
+                const anchor = document.createElement('div');
+                anchor.className = 'code-highlight-anchor';
+                anchor.id = `anchor-${index}`;
+                
+                block.parentNode.parentNode.insertBefore(wrapper, block.parentNode);
+                wrapper.appendChild(anchor);
+                wrapper.appendChild(block.parentNode);
+            });
+        });
+    </script>
+</body>
+</html>

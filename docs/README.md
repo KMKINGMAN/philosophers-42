@@ -38,6 +38,7 @@ The documentation is organized into several sections:
 5. **Documentation** (`documentation.html`): API reference for all functions and data structures
 6. **Game** (`game.html`): Interactive 3D game where users control philosophers
 7. **Learning Paths** (`learning-paths.html`): Different approaches to learning about the problem
+8. **History & Solutions** (`history.html`): Historical context and detailed solution approaches
 
 ## Directory Structure
 
@@ -59,6 +60,7 @@ docs/
 ├── documentation.html
 ├── game.html
 ├── learning-paths.html
+├── history.html
 └── banner-generator.html
 ```
 
@@ -71,3 +73,5 @@ docs/
 - **Complete API Reference**: Full documentation of all functions and data structures
 - **Interactive 3D Game**: Three.js powered game where users can control philosophers' actions
 - **Educational Content**: Lessons about concurrency concepts built into the interactive elements
+- **Historical Context**: Timeline and background on the problem's origins and key figures
+- **Solution Approaches**: Detailed explanations of various solution strategies, including monitors

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   inits.c                                            :+:      :+:    :+:   */
+/*   inits_fixed.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 15:56:27 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/22 22:32:56 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/22 22:29:49 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,7 @@ int	init_philosophers(t_data *data)
 		data->philosophers[i].left_fork = &data->forks[i];
 		data->philosophers[i].right_fork = &data->forks[(i + 1)
 			% data->num_philosophers];
-		data->philosophers[i].meal_mutex =
+		data->philosophers[i].meal_mutex = 
 			(pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 		i++;
 	}

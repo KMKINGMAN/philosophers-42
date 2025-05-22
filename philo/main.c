@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 17:25:34 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/22 14:19:03 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/22 22:32:58 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -307,11 +307,9 @@ void	*philosopher_routine(void *arg)
 			break;
 		}
 		pthread_mutex_unlock(&philo->data->state_mutex);
-
 		if (philo_eat(philo) == FAILURE \
 			|| philo_sleep(philo) == FAILURE \
-			|| philo_think(philo) == FAILURE
-		)
+			|| philo_think(philo) == FAILURE)
 			break;
 	}
 	return (NULL);

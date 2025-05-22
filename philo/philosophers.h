@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 17:27:46 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/21 20:26:25 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/22 22:29:50 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ typedef enum e_exit_status
 {
 	SUCCESS = 0,
 	FAILURE = 1
-} t_exit_status;
+}	t_exit_status;
 
 /* Commented out because using enum instead
 # define SUCCESS 0

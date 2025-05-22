@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 15:53:29 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/21 20:40:33 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/22 22:32:52 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,12 @@ int	ft_atoi(const char *str)
 	{
 		result = result * 10 + (str[i] - '0');
 		if (result * sign > INT_MAX || result * sign < INT_MIN)
-			return (sign == 1 ? -1 : 0);
+		{
+			if (sign == 1)
+				return (-1);
+			else
+				return (0);
+		}
 		i++;
 	}
 	return (result * sign);

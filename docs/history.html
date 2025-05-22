@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philosophers - History and Solutions</title>
+    <!-- Materialize CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #7e57c2;
+            left: 0;
+            top: 5px;
+        }
+        
+        .timeline-item:after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: calc(100% + 20px);
+            background-color: #7e57c2;
+            left: 7px;
+            top: 5px;
+            z-index: -1;
+        }
+        
+        .timeline-item:last-child:after {
+            display: none;
+        }
+        
+        .timeline-date {
+            font-weight: bold;
+            color: #7e57c2;
+            margin-bottom: 5px;
+        }
+        
+        .solution-card {
+            border-left: 4px solid #7e57c2;
+        }
+        
+        .person-img {
+            max-width: 150px;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .quote-block {
+            font-style: italic;
+            border-left: 4px solid #7e57c2;
+            padding-left: 20px;
+            margin: 20px 0;
+        }
+        
+        .monitor-diagram {
+            max-width: 100%;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar-fixed">
+        <nav class="deep-purple">
+            <div class="nav-wrapper container">
+                <a href="#!" class="brand-logo">Philosophers</a>
+                <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="overview.html">Overview</a></li>
+                    <li><a href="code-explained.html">Code Explained</a></li>
+                    <li><a href="visualization.html">Visualization</a></li>
+                    <li><a href="documentation.html">Documentation</a></li>
+                    <li><a href="game.html">Game</a></li>
+                    <li><a href="learning-paths.html">Learning Paths</a></li>
+                    <li class="active"><a href="history.html">History & Solutions</a></li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <ul class="sidenav" id="mobile-nav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="overview.html">Overview</a></li>
+        <li><a href="code-explained.html">Code Explained</a></li>
+        <li><a href="visualization.html">Visualization</a></li>
+        <li><a href="documentation.html">Documentation</a></li>
+        <li><a href="game.html">Game</a></li>
+        <li><a href="learning-paths.html">Learning Paths</a></li>
+        <li class="active"><a href="history.html">History & Solutions</a></li>
+    </ul>
+
+    <!-- Main Content -->
+    <div class="container section">
+        <div class="row">
+            <div class="col s12">
+                <h2 class="deep-purple-text">History of the Dining Philosophers Problem</h2>
+                <div class="divider"></div>
+            </div>
+        </div>
+
+        <!-- Historical Timeline -->
+        <div class="row">
+            <div class="col s12 m8 offset-m2">
+                <div class="card-panel">
+                    <h4>Historical Timeline</h4>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">1965</div>
+                        <div class="timeline-content">
+                            <p>Edsger W. Dijkstra first formulated the problem as an exercise in cooperation among processes. Initially, the problem was described with computers competing for access to tape drive peripherals.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">1971</div>
+                        <div class="timeline-content">
+                            <p>Tony Hoare reformulated Dijkstra's original problem in terms of dining philosophers, which made the concept more accessible and widely understood. The metaphor of dining philosophers allowed for clearer visualization of the concurrency challenges.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">1978</div>
+                        <div class="timeline-content">
+                            <p>In this year, Chandy and Misra proposed a significant refinement to the classical solutions, allowing for more efficient handling of concurrent resource access.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">1984</div>
+                        <div class="timeline-content">
+                            <p>The problem became a standard example in computer science education when Andrew S. Tanenbaum included it in his influential textbook "Operating Systems: Design and Implementation."</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-date">2000s-Present</div>
+                        <div class="timeline-content">
+                            <p>The Dining Philosophers problem continues to be one of the most studied examples in concurrent programming education. It has become fundamental to teaching principles of resource allocation, deadlock prevention, and process synchronization.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dijkstra & Hoare -->
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Edsger W. Dijkstra</span>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Edsger_Wybe_Dijkstra.jpg" alt="Edsger W. Dijkstra" class="person-img">
+                        <p class="quote-block">"The problem was first formulated in 1965, as a student exercise, to illustrate the dangers of deadlock and techniques for its prevention."</p>
+                        <p>Dijkstra's original formulation of the problem was meant to illustrate the challenges of avoiding deadlock, a situation in which concurrent processes are unable to proceed because each is waiting for resources held by another.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col s12 m6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Sir C. A. R. Hoare</span>
+                        <img src="./img/toney.png" alt="Tony Hoare" class="person-img">
+                        <p class="quote-block">"The problem is how to design a discipline of behavior (a concurrent algorithm) such that each philosopher will get to eat when he wants to, and no philosopher will starve waiting for forks."</p>
+                        <p>Hoare's reformulation of the problem as dining philosophers made it more relatable and easier to explain. This metaphor helped countless students understand the complexities of concurrent programming.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Solutions to the Problem -->
+        <div class="row">
+            <div class="col s12">
+                <h3 class="deep-purple-text">Classical Solutions</h3>
+                <div class="divider"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="card solution-card">
+                    <div class="card-content">
+                        <span class="card-title">Resource Hierarchy Solution</span>
+                        <p>Dijkstra's solution involved assigning a partial order to resources (the forks) and requiring processes to request resources in order, preventing the circular wait condition:</p>
+                        <ul class="browser-default">
+                            <li>Assign numbers to the forks from 1 to N</li>
+                            <li>Philosophers always pick up the lower-numbered fork first</li>
+                            <li>This breaks the circular dependency and prevents deadlock</li>
+                        </ul>
+                        <p>Although this solution prevents deadlock, it may still suffer from the problem of starvation.</p>
+                        
+                        <pre class="language-c"><code>// Pseudo-code for Resource Hierarchy Solution
+void philosopher(int i) {
+    while (true) {
+        think();
+        
+        // Always pick lowest-numbered fork first
+        int first = min(fork[i], fork[(i+1) % N]);
+        int second = max(fork[i], fork[(i+1) % N]);
+        
+        pick_up(first);
+        pick_up(second);
+        
+        eat();
+        
+        put_down(second);
+        put_down(first);
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col s12 m6">
+                <div class="card solution-card">
+                    <div class="card-content">
+                        <span class="card-title">Arbitrator Solution</span>
+                        <p>Another approach uses a central arbitrator (or waiter) that controls access to forks:</p>
+                        <ul class="browser-default">
+                            <li>Philosophers must ask permission from the waiter to pick up forks</li>
+                            <li>The waiter ensures at most N-1 philosophers are trying to eat simultaneously</li>
+                            <li>This eliminates the possibility of deadlock</li>
+                        </ul>
+                        <p>This solution prevents both deadlock and starvation but introduces a potential bottleneck with the central arbitrator.</p>
+                        
+                        <pre class="language-c"><code>// Pseudo-code for Arbitrator Solution
+semaphore waiter = 1;
+
+void philosopher(int i) {
+    while (true) {
+        think();
+        
+        wait(waiter);  // Ask permission from waiter
+        pick_up(fork[i]);
+        pick_up(fork[(i+1) % N]);
+        signal(waiter); // Waiter can now serve others
+        
+        eat();
+        
+        put_down(fork[i]);
+        put_down(fork[(i+1) % N]);
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="card solution-card">
+                    <div class="card-content">
+                        <span class="card-title">Chandy/Misra Solution</span>
+                        <p>Proposed in 1984, this solution works even with arbitrary topology:</p>
+                        <ul class="browser-default">
+                            <li>Uses "dirty" and "clean" forks</li>
+                            <li>Philosophers keep forks when done eating; they only release when asked</li>
+                            <li>Introduces request messages between philosophers</li>
+                            <li>A hungry philosopher with a dirty fork will always grant it when requested</li>
+                        </ul>
+                        <p>This solution is fully distributed with no central control point, and it prevents both deadlock and starvation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col s12 m6">
+                <div class="card solution-card">
+                    <div class="card-content">
+                        <span class="card-title">Limited Philosophers Solution</span>
+                        <p>Simply limit the number of philosophers who can attempt to eat simultaneously:</p>
+                        <ul class="browser-default">
+                            <li>Allow at most N-1 philosophers to sit at the table simultaneously</li>
+                            <li>This ensures at least one philosopher can acquire both forks</li>
+                            <li>Relatively simple to implement using a counting semaphore</li>
+                        </ul>
+                        <p>This approach guarantees no deadlock but may lead to unnecessary blocking if the removed philosophers aren't in contention.</p>
+                        
+                        <pre class="language-c"><code>// Pseudo-code for Limited Philosophers Solution
+semaphore chair_limit = N-1; // Allow only N-1 philosophers at table
+
+void philosopher(int i) {
+    while (true) {
+        think();
+        
+        wait(chair_limit);  // Try to sit at the table
+        pick_up(fork[i]);
+        pick_up(fork[(i+1) % N]);
+        
+        eat();
+        
+        put_down(fork[i]);
+        put_down(fork[(i+1) % N]);
+        signal(chair_limit); // Leave the table
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitor-Based Solution -->
+        <div class="row">
+            <div class="col s12">
+                <h3 class="deep-purple-text">Monitor-Based Solution</h3>
+                <div class="divider"></div>
+                <p class="flow-text">Monitor-based solutions employ a high-level synchronization construct that encapsulates both data and procedures needed for allocating the shared resources.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12">
+                <div class="card-panel">
+                    <h4>What is a Monitor?</h4>
+                    <p>A monitor is a synchronization construct that allows threads to have both mutual exclusion and the ability to wait for a condition to become true. Monitors have an important property that only one thread can be active within the monitor at a time.</p>
+                    
+                    <div class="card">
+                        <div class="card-content">
+                            <span class="card-title">Key Properties of Monitors</span>
+                            <ol>
+                                <li><strong>Mutual Exclusion:</strong> Only one thread can execute the monitor's procedures at a time.</li>
+                                <li><strong>Condition Variables:</strong> Allow threads to wait until certain conditions are met.</li>
+                                <li><strong>Signaling Mechanism:</strong> Threads can signal when conditions change, waking up waiting threads.</li>
+                                <li><strong>Encapsulation:</strong> Data and the operations on that data are encapsulated together.</li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <h4 class="margin-top-30">Monitor-Based Solution for Dining Philosophers</h4>
+                    <p>The monitor solution to the dining philosophers problem manages the states of all philosophers and controls when they can pick up forks:</p>
+                    
+                    <img src="https://i.imgur.com/fNrR0qi.png" alt="Monitor Concept Diagram" class="monitor-diagram">
+                    
+                    <pre class="language-c"><code>// Pseudo-code for Monitor-Based Solution
+enum { THINKING, HUNGRY, EATING } state[N];
+condition self[N];
+
+// Entry procedure that philosophers call when hungry
+void pickup(int i) {
+    // Enter monitor
+    state[i] = HUNGRY;
+    test(i);
+    if (state[i] != EATING)
+        self[i].wait(); // Wait if can't eat yet
+    // Exit monitor
+}
+
+// Entry procedure that philosophers call when done eating
+void putdown(int i) {
+    // Enter monitor
+    state[i] = THINKING;
+    test((i + N - 1) % N); // Test left neighbor
+    test((i + 1) % N);     // Test right neighbor
+    // Exit monitor
+}
+
+// Helper method that tests if a philosopher can eat
+void test(int i) {
+    if (state[(i + N - 1) % N] != EATING &&
+        state[i] == HUNGRY &&
+        state[(i + 1) % N] != EATING) {
+        state[i] = EATING;
+        self[i].signal(); // Wake up the waiting philosopher
+    }
+}
+
+// Main philosopher behavior
+void philosopher(int i) {
+    while (true) {
+        think();
+        pickup(i);
+        eat();
+        putdown(i);
+    }
+}</code></pre>
+
+                    <h4 class="margin-top-30">How the Monitor Solution Works</h4>
+                    <ol>
+                        <li>Each philosopher can be in one of three states: THINKING, HUNGRY, or EATING.</li>
+                        <li>The <code>pickup()</code> function is called when a philosopher gets hungry. It changes the philosopher's state to HUNGRY and calls <code>test()</code>.</li>
+                        <li>The <code>test()</code> function checks if the philosopher can start eating (both neighbors are not eating). If so, it changes the philosopher's state to EATING.</li>
+                        <li>If the philosopher cannot eat yet, they wait on their condition variable.</li>
+                        <li>The <code>putdown()</code> function is called when a philosopher finishes eating. It sets their state back to THINKING and checks if either neighbor can now eat.</li>
+                    </ol>
+                    
+                    <div class="card deep-purple lighten-5">
+                        <div class="card-content">
+                            <span class="card-title">Advantages of the Monitor Solution</span>
+                            <ul class="browser-default">
+                                <li>Prevents deadlock by design</li>
+                                <li>No starvation (fairness can be built in with additional techniques)</li>
+                                <li>Encapsulates all synchronization logic in one place</li>
+                                <li>Simplifies reasoning about the correctness of the solution</li>
+                                <li>High-level abstraction makes it less error-prone than directly using semaphores</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h4 class="margin-top-30">Implementation in Modern Languages</h4>
+                    <p>Modern programming languages provide various mechanisms to implement monitor-like behavior:</p>
+                    
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <span class="card-title">Java</span>
+                                    <p>Uses the <code>synchronized</code> keyword and <code>wait()</code>/<code>notify()</code> methods:</p>
+                                    <pre><code class="language-java">synchronized void pickup(int i) {
+    state[i] = HUNGRY;
+    test(i);
+    while (state[i] != EATING) {
+        try {
+            wait();
+        } catch (InterruptedException e) {}
+    }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col s12 m6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <span class="card-title">C++ (with C++11 and later)</span>
+                                    <p>Uses <code>std::mutex</code>, <code>std::condition_variable</code>, and lock guards:</p>
+                                    <pre><code class="language-cpp">void pickup(int i) {
+    std::unique_lock<std::mutex> lock(mutex);
+    state[i] = HUNGRY;
+    test(i);
+    while (state[i] != EATING)
+        self[i].wait(lock);
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monitor vs Other Solutions Comparison -->
+        <div class="row">
+            <div class="col s12">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Comparison of Solutions</span>
+                        <table class="striped responsive-table">
+                            <thead>
+                                <tr>
+                                    <th>Solution</th>
+                                    <th>Prevents Deadlock</th>
+                                    <th>Prevents Starvation</th>
+                                    <th>Complexity</th>
+                                    <th>Scalability</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Resource Hierarchy</td>
+                                    <td><i class="material-icons green-text">check</i></td>
+                                    <td><i class="material-icons red-text">close</i></td>
+                                    <td>Low</td>
+                                    <td>Good</td>
+                                </tr>
+                                <tr>
+                                    <td>Arbitrator</td>
+                                    <td><i class="material-icons green-text">check</i></td>
+                                    <td><i class="material-icons green-text">check</i></td>
+                                    <td>Medium</td>
+                                    <td>Poor (bottleneck)</td>
+                                </tr>
+                                <tr>
+                                    <td>Chandy/Misra</td>
+                                    <td><i class="material-icons green-text">check</i></td>
+                                    <td><i class="material-icons green-text">check</i></td>
+                                    <td>High</td>
+                                    <td>Excellent</td>
+                                </tr>
+                                <tr>
+                                    <td>Limited Philosophers</td>
+                                    <td><i class="material-icons green-text">check</i></td>
+                                    <td><i class="material-icons orange-text">adjust</i></td>
+                                    <td>Low</td>
+                                    <td>Good</td>
+                                </tr>
+                                <tr>
+                                    <td>Monitor-Based</td>
+                                    <td><i class="material-icons green-text">check</i></td>
+                                    <td><i class="material-icons green-text">check</i></td>
+                                    <td>Medium</td>
+                                    <td>Good</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relevance Today -->
+        <div class="row">
+            <div class="col s12">
+                <div class="card-panel deep-purple lighten-5">
+                    <h4>Relevance in Modern Computing</h4>
+                    <p class="flow-text">Despite being formulated over 50 years ago, the Dining Philosophers problem remains highly relevant today:</p>
+                    
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <ul class="browser-default">
+                                <li><strong>Multicore Programming:</strong> With modern CPUs having multiple cores, concurrent programming challenges are more relevant than ever.</li>
+                                <li><strong>Distributed Systems:</strong> Cloud computing and microservices face distributed versions of the same resource allocation problems.</li>
+                                <li><strong>Mobile Computing:</strong> Efficient resource management on battery-powered devices requires careful synchronization.</li>
+                            </ul>
+                        </div>
+                        <div class="col s12 m6">
+                            <ul class="browser-default">
+                                <li><strong>Database Systems:</strong> Transaction management involves solving similar deadlock prevention challenges.</li>
+                                <li><strong>IoT Systems:</strong> Multiple devices sharing limited network and cloud resources face similar coordination issues.</li>
+                                <li><strong>AI and Machine Learning:</strong> Parallel algorithms for training models must manage shared memory and processing resources.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="page-footer deep-purple">
+        <div class="container">
+            <div class="row">
+                <div class="col s12 m6">
+                    <h5 class="white-text">About This Project</h5>
+                    <p class="grey-text text-lighten-4">
+                        This project was developed as part of the 42 curriculum, demonstrating understanding of threads,
+                        mutexes, and concurrent programming principles.
+                    </p>
+                </div>
+                <div class="col s12 m4 offset-m2">
+                    <h5 class="white-text">Links</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" href="https://en.wikipedia.org/wiki/Dining_philosophers_problem" target="_blank">Wikipedia: Dining Philosophers Problem</a></li>
+                        <li><a class="grey-text text-lighten-3" href="https://apply.42amman.com" target="_blank">42 Network - 42 Amman</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                © 2025 Philosophers Project Documentation
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Materialize components
+            M.AutoInit();
+        });
+    </script>
+</body>
+</html>

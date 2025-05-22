@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 17:25:34 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/21 20:51:24 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/22 14:19:03 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -680,23 +680,23 @@ int	create_threads(t_data *data)
  * @return int 0 on success, 1 on failure
  * 
  * Example:
- * ┌─────────────────────────────────────────────────┐
- * │ Program Execution Flow:                         │
- * │                                                 │
- * │ 1. Initialize data structure with zeros         │
- * │ 2. Parse and validate command-line arguments    │
- * │ 3. Initialize forks (mutexes)                   │
- * │ 4. Initialize philosopher structures            │
- * │ 5. Create and manage threads                    │
- * │ 6. Clean up resources                           │
- * │                                                 │
- * │ Program Arguments:                              │
- * │ ./philo number_of_philosophers time_to_die      │
- * │        time_to_eat time_to_sleep                │
+ * ┌────────────────────────────────────────────────────┐
+ * │ Program Execution Flow:                            │
+ * │                                                    │
+ * │ 1. Initialize data structure with zeros            │
+ * │ 2. Parse and validate command-line arguments       │
+ * │ 3. Initialize forks (mutexes)                      │
+ * │ 4. Initialize philosopher structures               │
+ * │ 5. Create and manage threads                       │
+ * │ 6. Clean up resources                              │
+ * │                                                    │
+ * │ Program Arguments:                                 │
+ * │ ./philo number_of_philosophers time_to_die         │
+ * │        time_to_eat time_to_sleep                   │
  * │        [number_of_times_each_philosopher_must_eat] │
- * │                                                 │
- * │ Example: ./philo 5 800 200 200 7                │
- * └─────────────────────────────────────────────────┘
+ * │                                                    │
+ * │ Example: ./philo 5 800 200 200 7                   │
+ * └────────────────────────────────────────────────────┘
  */
 /* Main function */
 int	main(int argc, char **argv)

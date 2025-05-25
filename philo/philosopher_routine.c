@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 09:42:47 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/25 11:46:00 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/25 15:59:09 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,7 @@ int	philo_eat(t_philo *philo)
  */
 void	*philosopher_routine(void *arg)
 {
-	t_philo *philo;
+	t_philo	*philo;
 
 	philo = (t_philo *)arg;
 	wait_for_all_threads(philo);
@@ -214,7 +214,6 @@ void	*philosopher_routine(void *arg)
 	pthread_mutex_lock(&philo->meal_mutex);
 	philo->last_meal_time = get_time();
 	pthread_mutex_unlock(&philo->meal_mutex);
-
 	while (1)
 	{
 		pthread_mutex_lock(&philo->data->state_mutex);

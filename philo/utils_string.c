@@ -6,29 +6,11 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 15:53:29 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/25 09:53:01 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/25 15:55:36 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-/**
- * @name ft_isdigit
- * @brief Checks if a character is a digit (0-9)
- *
- * @param c Character to check
- * @return int 1 if the character is a digit, 0 otherwise
- *
- * Example:
- * ┌─────────────────────────────┐
- * │ ft_isdigit('5') → 1 (true)  │
- * │ ft_isdigit('a') → 0 (false) │
- * └─────────────────────────────┘
- */
-int	ft_isdigit(int c)
-{
-	return (c >= '0' && c <= '9');
-}
 
 /**
  * @name ft_atoi
@@ -47,14 +29,15 @@ int	ft_isdigit(int c)
  */
 int	ft_atoi(const char *str)
 {
-	int		i;
-	int		sign;
-	long	result;
+	int	i;
+	int	sign;
+	int	res;
 
 	i = 0;
 	sign = 1;
-	result = 0;
-	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
+	res = 0;
+	while (str[i] == ' ' || str[i] == '\t' || str[i] == '\n' || str[i] == '\v'
+		|| str[i] == '\f' || str[i] == '\r')
 		i++;
 	if (str[i] == '-' || str[i] == '+')
 	{
@@ -62,17 +45,10 @@ int	ft_atoi(const char *str)
 			sign = -1;
 		i++;
 	}
-	while (str[i] && ft_isdigit(str[i]))
+	while (ft_isdigit(str[i]))
 	{
-		result = result * 10 + (str[i] - '0');
-		if (result * sign > INT_MAX || result * sign < INT_MIN)
-		{
-			if (sign == 1)
-				return (-1);
-			else
-				return (0);
-		}
+		res = res * 10 + str[i] - '0';
 		i++;
 	}
-	return (result * sign);
+	return (res * sign);
 }

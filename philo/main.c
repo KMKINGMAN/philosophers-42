@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 17:25:34 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/25 11:46:13 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/25 15:54:38 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,6 @@ int	create_threads(t_data *data)
 	pthread_mutex_lock(&data->state_mutex);
 	data->all_threads_ready = 1;
 	pthread_mutex_unlock(&data->state_mutex);
-	/* Wait for all philosopher threads to finish */
 	i = 0;
 	while (i < data->num_philosophers)
 	{
@@ -168,7 +167,6 @@ int	create_threads(t_data *data)
 			return (FAILURE);
 		i++;
 	}
-	/* Wait for monitor thread */
 	if (pthread_join(monitor, NULL) != 0)
 		return (FAILURE);
 	return (SUCCESS);
@@ -204,7 +202,7 @@ int	create_threads(t_data *data)
 /* Main function */
 int	main(int argc, char **argv)
 {
-	t_data data;
+	t_data	data;
 
 	memset(&data, 0, sizeof(t_data));
 	if (init_data(&data, argc, argv) == FAILURE)

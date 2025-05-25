@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 15:53:29 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/22 22:32:52 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/25 09:53:01 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,9 @@ int	ft_isdigit(int c)
  */
 int	ft_atoi(const char *str)
 {
-	int			i;
-	int			sign;
-	long		result;
+	int		i;
+	int		sign;
+	long	result;
 
 	i = 0;
 	sign = 1;

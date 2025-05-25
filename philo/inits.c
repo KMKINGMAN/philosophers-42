@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 15:56:27 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/22 22:32:56 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/25 09:29:20 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ int	init_data(t_data *data, int argc, char **argv)
 	if (argc == 6)
 		data->must_eat_count = ft_atoi(argv[5]);
 	if (data->num_philosophers <= 0 || data->time_to_die <= 0
-		|| data->time_to_eat <= 0 || data->time_to_sleep <= 0
-		|| (argc == 6 && data->must_eat_count <= 0))
+		|| data->time_to_eat <= 0 || data->time_to_sleep <= 0 || (argc == 6
+			&& data->must_eat_count <= 0))
 		return (printf("Error: Invalid arguments\n"), FAILURE);
 	data->print_mutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 	data->state_mutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
@@ -127,8 +127,7 @@ int	init_philosophers(t_data *data)
 		data->philosophers[i].left_fork = &data->forks[i];
 		data->philosophers[i].right_fork = &data->forks[(i + 1)
 			% data->num_philosophers];
-		data->philosophers[i].meal_mutex =
-			(pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
+		data->philosophers[i].meal_mutex = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 		i++;
 	}
 	return (SUCCESS);

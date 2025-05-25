@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 15:55:48 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/21 20:40:35 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/05/25 09:57:11 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ void	print_status(t_philo *philo, char *status)
  * @brief Releases all allocated memory for the simulation
  *
  * @param data Pointer to the main data structure
- * 
+ *
  * Example:
  * ┌─────────────────────────────────────────────────┐
  * │ Memory Management Flow:                         │
@@ -74,4 +74,54 @@ void	free_data(t_data *data)
 		free(data->philosophers);
 		data->philosophers = NULL;
 	}
+}
+
+/**
+ * @name philo_sleep
+ * @brief Handles the sleeping action of a philosopher
+ *
+ * @param philo Pointer to philosopher structure
+ * @return int SUCCESS always
+ *
+ * Example:
+ * ┌─────────────────────────────────────────────────┐
+ * │ Sleeping Process:                               │
+ * │                                                 │
+ * │ 1. Print sleeping status                        │
+ * │ 2. Sleep for time_to_sleep milliseconds         │
+ * │ 3. Return success                               │
+ * │                                                 │
+ * │ This simulates the philosopher resting          │
+ * └─────────────────────────────────────────────────┘
+ */
+int	philo_sleep(t_philo *philo)
+{
+	print_status(philo, "is sleeping");
+	precise_sleep(philo->data->time_to_sleep);
+	return (SUCCESS);
+}
+
+/**
+ * @name philo_think
+ * @brief Handles the thinking action of a philosopher
+ *
+ * @param philo Pointer to philosopher structure
+ * @return int SUCCESS always
+ *
+ * Example:
+ * ┌─────────────────────────────────────────────────┐
+ * │ Thinking Process:                               │
+ * │                                                 │
+ * │ 1. Print thinking status                        │
+ * │ 2. Brief pause (usleep 500 microseconds)        │
+ * │ 3. Return success                               │
+ * │                                                 │
+ * │ This simulates the philosopher contemplating    │
+ * └─────────────────────────────────────────────────┘
+ */
+int	philo_think(t_philo *philo)
+{
+	print_status(philo, "is thinking");
+	usleep(500);
+	return (SUCCESS);
 }

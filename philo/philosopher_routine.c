@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosopher_routine.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
+/*   By: mkurkar <mkurkar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/25 09:42:47 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/25 15:59:09 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/06/08 20:52:23 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,6 +223,16 @@ void	*philosopher_routine(void *arg)
 			break ;
 		}
 		pthread_mutex_unlock(&philo->data->state_mutex);
+		if (philo->data->must_eat_count != -1)
+		{
+			pthread_mutex_lock(&philo->meal_mutex);
+			if (philo->meals_eaten >= philo->data->must_eat_count)
+			{
+				pthread_mutex_unlock(&philo->meal_mutex);
+				break ;
+			}
+			pthread_mutex_unlock(&philo->meal_mutex);
+		}
 		if (philo_eat(philo) == FAILURE || philo_sleep(philo) == FAILURE
 			|| philo_think(philo) == FAILURE)
 			break ;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
+/*   By: mkurkar <mkurkar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 17:25:34 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/25 15:54:38 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/06/08 20:34:21 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,6 +152,7 @@ int	create_threads(t_data *data)
 	int			i;
 	pthread_t	monitor;
 
+	i = 0;
 	data->start_time = get_time();
 	if (init_meal_times(data) == FAILURE)
 		return (FAILURE);
@@ -160,7 +161,6 @@ int	create_threads(t_data *data)
 	pthread_mutex_lock(&data->state_mutex);
 	data->all_threads_ready = 1;
 	pthread_mutex_unlock(&data->state_mutex);
-	i = 0;
 	while (i < data->num_philosophers)
 	{
 		if (pthread_join(data->philosophers[i].thread, NULL) != 0)

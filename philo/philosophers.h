@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philosophers.h                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
+/*   By: mkurkar <mkurkar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 17:27:46 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/25 12:03:11 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/06/11 15:46:14 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,12 @@ void					*monitor_routine(void *arg);
 int						philo_eat(t_philo *philo);
 int						philo_sleep(t_philo *philo);
 int						philo_think(t_philo *philo);
+
+/* Helper functions for actions */
+void					setup_forks(t_philo *philo, t_fork **first,
+							t_fork **second);
+int						handle_single_philo(t_philo *philo, t_fork *first);
+void					update_meal_status(t_philo *philo, int is_eating);
 
 /* Utils functions */
 int						ft_atoi(const char *str);

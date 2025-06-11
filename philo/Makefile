@@ -4,7 +4,14 @@ CC			= gcc
 CFLAGS		= -Wall -Wextra -Werror -g
 RM			= rm -f
 
-SRCS		= main.c inits.c time_management.c utils_problem.c utils_string.c philosopher_routine.c philosopher_monitor.c
+SRCS		= main.c \
+				inits.c \
+				time_management.c \
+				utils_problem.c \
+				utils_string.c \
+				philosopher_routine.c \
+				philosopher_monitor.c \
+				philo_actions.c
 
 OBJS		= $(SRCS:.c=.o)
 

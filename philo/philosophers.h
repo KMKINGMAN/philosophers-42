@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/05 17:27:46 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/06/11 15:46:14 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/06/16 10:34:57 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,10 @@ int						ft_atoi(const char *str);
 int						ft_isdigit(int c);
 long long				get_time(void);
 void					precise_sleep(long long time_in_ms);
+int						interruptible_sleep(t_philo *philo,
+							long long time_in_ms);
 void					print_status(t_philo *philo, char *status);
+int						check_simulation_stop(t_philo *philo);
 
 /* Cleanup functions */
 void					free_data(t_data *data);

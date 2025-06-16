@@ -6,7 +6,7 @@
 /*   By: mkurkar <mkurkar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 15:55:48 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/06/11 15:46:15 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/06/16 10:31:32 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,8 +96,11 @@ void	free_data(t_data *data)
  */
 int	philo_sleep(t_philo *philo)
 {
+	if (check_simulation_stop(philo))
+		return (FAILURE);
 	print_status(philo, "is sleeping");
-	precise_sleep(philo->data->time_to_sleep);
+	if (interruptible_sleep(philo, philo->data->time_to_sleep) == FAILURE)
+		return (FAILURE);
 	return (SUCCESS);
 }
 
@@ -121,7 +124,31 @@ int	philo_sleep(t_philo *philo)
  */
 int	philo_think(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->data->state_mutex);
+	if (philo->data->simulation_stop)
+	{
+		pthread_mutex_unlock(&philo->data->state_mutex);
+		return (FAILURE);
+	}
+	pthread_mutex_unlock(&philo->data->state_mutex);
 	print_status(philo, "is thinking");
 	usleep(500);
 	return (SUCCESS);
+}
+
+/**
+ * @name check_simulation_stop
+ * @brief Checks if simulation should stop
+ *
+ * @param philo Pointer to philosopher structure
+ * @return int 1 if should stop, 0 otherwise
+ */
+int	check_simulation_stop(t_philo *philo)
+{
+	int	stop;
+
+	pthread_mutex_lock(&philo->data->state_mutex);
+	stop = philo->data->simulation_stop;
+	pthread_mutex_unlock(&philo->data->state_mutex);
+	return (stop);
 }

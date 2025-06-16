@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   time_management.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkurkar <mkurkar@student.42amman.com>      +#+  +:+       +#+        */
+/*   By: mkurkar <mkurkar@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/08 15:54:39 by mkurkar           #+#    #+#             */
-/*   Updated: 2025/05/21 20:40:34 by mkurkar          ###   ########.fr       */
+/*   Updated: 2025/06/16 10:31:28 by mkurkar          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,26 @@ void	precise_sleep(long long time_in_ms)
 	start_time = get_time();
 	while ((get_time() - start_time) < time_in_ms)
 		usleep(100);
+}
+
+/**
+ * @name interruptible_sleep
+ * @brief Sleeps for a specified time but can be interrupted by simulation stop
+ *
+ * @param philo Pointer to philosopher structure
+ * @param time_in_ms Time to sleep in milliseconds
+ * @return int SUCCESS if completed normally, FAILURE if interrupted
+ */
+int	interruptible_sleep(t_philo *philo, long long time_in_ms)
+{
+	long long	start_time;
+
+	start_time = get_time();
+	while ((get_time() - start_time) < time_in_ms)
+	{
+		if (check_simulation_stop(philo))
+			return (FAILURE);
+		usleep(100);
+	}
+	return (SUCCESS);
 }
